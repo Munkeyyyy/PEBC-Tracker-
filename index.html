@@ -1,1655 +1,1799 @@
 <!DOCTYPE html>
-<html lang="en"> 
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PEBC MCQ 2026 — Study Tracker</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
 <style>
-  :root {
-    --navy:     #131E3A;
-    --beige:    #DDCDC2;
-    --coral:    #FF5454;
-    --white:    #FFFFFF;
-    --c1:       #27ae60;
-    --c2:       #2980b9;
-    --c3:       #e67e22;
-    --text:     #131E3A;
-    --text-dim: #8892a4;
-    --text-mid: #4a5568;
-    --border:   #e8edf2;
-    --bg:       #f4f6f9;
-    --sidebar-w: 220px;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'Nunito', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* ── LAYOUT ── */
-  .app-layout { display: flex; min-height: 100vh; }
-
-  /* ── SIDEBAR ── */
-  .sidebar {
-    width: var(--sidebar-w);
-    background: var(--navy);
-    color: var(--white);
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    top: 0; left: 0; bottom: 0;
-    z-index: 50;
-    overflow-y: auto;
-    overflow-x: hidden;
-  }
-
-  .sidebar-brand {
-    padding: 24px 20px 4px;
-    font-size: 15px;
-    font-weight: 900;
-    color: var(--white);
-    line-height: 1.2;
-  }
-
-  .sidebar-sub {
-    padding: 4px 20px 18px;
-    font-size: 10px;
-    color: rgba(255,255,255,0.45);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    margin-bottom: 8px;
-  }
-
-  .sidebar-nav { padding: 8px 10px; }
-
-  .nav-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 9px 12px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 700;
-    color: rgba(255,255,255,0.6);
-    cursor: pointer;
-    text-decoration: none;
-    transition: all 0.15s;
-    margin-bottom: 2px;
-    user-select: none;
-  }
-
-  .nav-item:hover { background: rgba(255,255,255,0.08); color: var(--white); }
-  .nav-item.active { background: var(--coral); color: var(--white); }
-  .nav-icon { font-size: 14px; width: 18px; text-align: center; flex-shrink: 0; }
-
-  .sidebar-section-title {
-    padding: 16px 20px 6px;
-    font-size: 9px;
-    font-weight: 800;
-    color: rgba(255,255,255,0.3);
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-  }
-
-  .sidebar-weeks { padding: 0 10px 24px; flex: 1; overflow-y: auto; }
-
-  .sidebar-week-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 7px 10px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.15s;
-    margin-bottom: 1px;
-  }
-
-  .sidebar-week-item:hover { background: rgba(255,255,255,0.07); }
-  .sidebar-week-item.active-week { background: rgba(255,84,84,0.18); }
-
-  .sidebar-week-num {
-    font-size: 10px;
-    font-weight: 800;
-    color: var(--coral);
-    width: 22px;
-    flex-shrink: 0;
-  }
-
-  .sidebar-week-label {
-    font-size: 11px;
-    font-weight: 600;
-    color: rgba(255,255,255,0.6);
-    line-height: 1.3;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    flex: 1;
-  }
-
-  .sidebar-week-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--coral);
-    flex-shrink: 0;
-    opacity: 0;
-  }
-
-  .sidebar-week-item.current-week .sidebar-week-dot { opacity: 1; }
-
-  .sidebar::-webkit-scrollbar,
-  .sidebar-weeks::-webkit-scrollbar { width: 3px; }
-  .sidebar::-webkit-scrollbar-track,
-  .sidebar-weeks::-webkit-scrollbar-track { background: transparent; }
-  .sidebar::-webkit-scrollbar-thumb,
-  .sidebar-weeks::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
-
-  /* ── MAIN AREA ── */
-  .main-area {
-    margin-left: var(--sidebar-w);
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
-
-  /* ── HEADER BAR ── */
-  .main-header {
-    background: var(--white);
-    border-bottom: 1px solid var(--border);
-    padding: 14px 28px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    position: sticky;
-    top: 0;
-    z-index: 40;
-    flex-shrink: 0;
-  }
-
-  .header-left { flex: 1; min-width: 0; }
-
-  .header-week-title {
-    font-size: 16px;
-    font-weight: 800;
-    color: var(--navy);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .header-week-dates {
-    font-size: 11px;
-    color: var(--text-dim);
-    font-weight: 600;
-    margin-top: 1px;
-  }
-
-  .header-search { position: relative; flex-shrink: 0; }
-
-  .search-input {
-    width: 220px;
-    padding: 7px 12px 7px 34px;
-    border: 1.5px solid var(--border);
-    border-radius: 8px;
-    font-family: 'Nunito', sans-serif;
-    font-size: 13px;
-    color: var(--text);
-    outline: none;
-    transition: border-color 0.15s;
-    background: var(--bg);
-  }
-
-  .search-input:focus { border-color: var(--coral); }
-
-  .search-icon {
-    position: absolute;
-    left: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-dim);
-    font-size: 13px;
-    pointer-events: none;
-  }
-
-  /* Progress ring */
-  .progress-ring-wrap { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-  .ring-labels { text-align: right; }
-  .ring-pct { font-size: 18px; font-weight: 900; color: var(--navy); line-height: 1; }
-  .ring-sub { font-size: 10px; color: var(--text-dim); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
-
-  .ring-svg { display: block; transform: rotate(-90deg); }
-  .ring-track { fill: none; stroke: var(--border); stroke-width: 5; }
-  .ring-fill { fill: none; stroke-width: 5; stroke-linecap: round; transition: stroke-dashoffset 0.5s ease; }
-  .ring-fill.r-c1 { stroke: var(--c1); }
-
-  /* Countdown chip */
-  .countdown-chip {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background: var(--navy);
-    border-radius: 10px;
-    padding: 8px 14px;
-    flex-shrink: 0;
-  }
-
-  .countdown-chip .days-num { font-size: 20px; font-weight: 900; color: var(--beige); line-height: 1; }
-  .countdown-chip .days-label { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.45); margin-top: 2px; font-weight: 700; }
-
-  /* ── TAB BAR ── */
-  .tab-bar {
-    display: flex;
-    padding: 0 28px;
-    background: var(--white);
-    border-bottom: 1px solid var(--border);
-    flex-shrink: 0;
-  }
-
-  .tab-btn {
-    padding: 11px 18px;
-    font-family: 'Nunito', sans-serif;
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--text-dim);
-    background: none;
-    border: none;
-    border-bottom: 2.5px solid transparent;
-    margin-bottom: -1px;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-
-  .tab-btn:hover { color: var(--navy); }
-  .tab-btn.active { color: var(--coral); border-bottom-color: var(--coral); }
-
-  /* ── TAB CONTENT ── */
-  .tab-content { display: none; padding: 24px 28px 56px; }
-  .tab-content.active { display: block; }
-
-  /* ── STATS STRIP ── */
-  .stats-strip { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
-
-  .stat-pill {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px 16px;
-    min-width: 110px;
-  }
-
-  .sp-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); font-weight: 700; margin-bottom: 4px; }
-  .sp-val { font-size: 22px; font-weight: 900; color: var(--navy); line-height: 1; }
-  .sp-val span { font-size: 12px; font-weight: 600; color: var(--text-dim); }
-  .stat-pill.p-c1 .sp-val { color: var(--c1); }
-  .stat-pill.p-c2 .sp-val { color: var(--c2); }
-  .stat-pill.p-c3 .sp-val { color: var(--c3); }
-
-  /* ── PROGRESS BAR ── */
-  .progress-wrap {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px 18px;
-    margin-bottom: 16px;
-  }
-
-  .progress-label-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  .progress-track { height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden; display: flex; gap: 2px; }
-  .progress-fill { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
-  .progress-fill.c1 { background: var(--c1); }
-  .progress-fill.c2 { background: var(--c2); }
-  .progress-fill.c3 { background: var(--c3); }
-
-  /* ── LEGEND ── */
-  .legend-row { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
-  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-dim); font-weight: 700; }
-  .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
-
-  /* ── CONTROLS ── */
-  .controls-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 20px; }
-
-  .filter-btn {
-    background: var(--white);
-    border: 1.5px solid var(--border);
-    color: var(--text-dim);
-    font-family: 'Nunito', sans-serif;
-    font-size: 12px;
-    font-weight: 700;
-    padding: 6px 14px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.15s;
-    letter-spacing: 0.3px;
-  }
-
-  .filter-btn:hover { border-color: var(--coral); color: var(--coral); }
-  .filter-btn.active { background: var(--coral); color: var(--white); border-color: var(--coral); }
-
-  .export-btn {
-    margin-left: auto;
-    background: transparent;
-    border: 1.5px solid var(--navy);
-    color: var(--navy);
-    font-family: 'Nunito', sans-serif;
-    font-size: 12px;
-    font-weight: 700;
-    padding: 6px 16px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-
-  .export-btn:hover { background: var(--navy); color: var(--white); }
-  #autosaveIndicator {
-    font-size: 11px; font-weight: 600; color: var(--c1);
-    opacity: 0; transition: opacity 0.3s;
-    align-self: center; margin-left: 8px;
-  }
-  #autosaveIndicator.visible { opacity: 1; }
-
-  /* ── WEEK BLOCKS ── */
-  .week-block {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-    margin-bottom: 14px;
-    transition: opacity 0.2s;
-  }
-
-  .week-block.filtered-out { display: none; }
-
-  .week-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 13px 18px;
-    background: var(--white);
-    cursor: pointer;
-    user-select: none;
-    border-bottom: 1px solid transparent;
-    transition: background 0.15s;
-  }
-
-  .week-header:hover { background: #fafbfc; }
-  .week-block:not(.collapsed) .week-header { border-bottom-color: var(--border); }
-
-  .week-num {
-    font-size: 10px;
-    font-weight: 800;
-    color: var(--coral);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    background: rgba(255,84,84,0.08);
-    padding: 3px 8px;
-    border-radius: 4px;
-    flex-shrink: 0;
-  }
-
-  .week-title { font-size: 14px; font-weight: 800; color: var(--navy); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .week-dates { font-size: 11px; color: var(--text-dim); font-weight: 600; white-space: nowrap; }
-
-  .current-badge {
-    font-size: 10px;
-    font-weight: 800;
-    text-transform: uppercase;
-    background: var(--coral);
-    color: white;
-    padding: 2px 8px;
-    border-radius: 10px;
-    flex-shrink: 0;
-  }
-
-  .week-mini-bar { width: 64px; height: 5px; background: var(--bg); border-radius: 3px; overflow: hidden; flex-shrink: 0; }
-  .week-mini-fill { height: 100%; background: var(--c1); border-radius: 3px; transition: width 0.3s; }
-  .week-pct { font-size: 11px; font-weight: 700; color: var(--text-dim); width: 30px; text-align: right; flex-shrink: 0; }
-  .chevron { font-size: 11px; color: var(--text-dim); transition: transform 0.2s; flex-shrink: 0; }
-  .week-block.collapsed .chevron { transform: rotate(-90deg); }
-  .week-block.collapsed .week-body { display: none; }
-
-  /* ── COLUMN HEADER ── */
-  .col-header {
-    display: grid;
-    grid-template-columns: 100px 1fr 1fr 1fr 120px;
-    padding: 6px 18px;
-    background: #fafbfc;
-    font-size: 9px;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: var(--text-dim);
-    border-bottom: 1px solid var(--border);
-  }
-
-  /* ── DAY ROWS ── */
-  .day-row {
-    display: grid;
-    grid-template-columns: 100px 1fr 1fr 1fr 120px;
-    border-top: 1px solid var(--border);
-    min-height: 50px;
-    transition: background 0.1s;
-  }
-
-  .day-row:hover { background: #fafbfc; }
-  .day-row.drag-over { background: rgba(255,84,84,0.04); outline: 2px dashed var(--coral); outline-offset: -2px; }
-
-  .day-cell {
-    padding: 9px 12px;
-    border-right: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    min-width: 0;
-  }
-
-  .day-cell:last-child { border-right: none; }
-  .day-label { font-size: 12px; font-weight: 800; color: var(--navy); }
-  .day-date { font-size: 10px; color: var(--text-dim); font-weight: 600; margin-top: 2px; }
-
-  /* ── TOPIC ITEMS ── */
-  .topic-list { display: flex; flex-direction: column; gap: 4px; }
-
-  .topic-item {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    padding: 2px 4px;
-    cursor: grab;
-    border-radius: 4px;
-    transition: background 0.1s;
-  }
-
-  .topic-item:hover { background: rgba(0,0,0,0.03); }
-  .topic-item:active { cursor: grabbing; }
-  .topic-item.dragging { opacity: 0.35; }
-
-  .cycle-check {
-    width: 16px; height: 16px;
-    border-radius: 4px;
-    border: 2px solid;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.15s;
-    cursor: pointer;
-    font-size: 9px;
-    font-weight: 800;
-  }
-
-  .cycle-check.c1 { border-color: var(--c1); color: var(--c1); }
-  .cycle-check.c1.checked { background: var(--c1); color: white; }
-  .cycle-check.c2 { border-color: var(--c2); color: var(--c2); }
-  .cycle-check.c2.checked { background: var(--c2); color: white; }
-  .cycle-check.c3 { border-color: var(--c3); color: var(--c3); }
-  .cycle-check.c3.checked { background: var(--c3); color: white; }
-
-  .topic-name { font-size: 12px; font-weight: 700; color: var(--text-mid); line-height: 1.3; transition: color 0.15s; min-width: 0; }
-  .topic-item:hover .topic-name { color: var(--navy); }
-  .topic-item.all-done .topic-name { color: var(--text-dim); text-decoration: line-through; }
-
-  /* ── SPECIAL ROWS ── */
-  .special-row { border-top: 1px solid var(--border); padding: 10px 18px; display: flex; align-items: center; gap: 10px; background: #fafbfc; }
-
-  .special-tag {
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    padding: 3px 10px;
-    border-radius: 4px;
-    flex-shrink: 0;
-  }
-
-  .special-tag.quiz { background: rgba(41,128,185,0.1); color: var(--c2); }
-  .special-tag.mock { background: rgba(255,84,84,0.1); color: var(--coral); }
-  .special-tag.rest { background: rgba(39,174,96,0.1); color: var(--c1); }
-  .special-text { font-size: 12px; color: var(--text-mid); font-weight: 600; }
-  .notes-cell { font-size: 11px; color: var(--text-dim); font-style: italic; line-height: 1.4; font-weight: 600; }
-
-  /* ── MODAL ── */
-  .modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.45);
-    z-index: 200;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .modal-overlay.open { display: flex; }
-
-  .modal {
-    background: var(--white);
-    border-radius: 14px;
-    padding: 28px;
-    max-width: 680px;
-    width: 90%;
-    max-height: 80vh;
-    overflow-y: auto;
-    box-shadow: 0 20px 60px rgba(19,30,58,0.15);
-  }
-
-  .modal h2 { font-size: 18px; font-weight: 900; color: var(--navy); margin-bottom: 16px; }
-
-  .modal textarea {
-    width: 100%;
-    height: 320px;
-    background: var(--bg);
-    border: 1.5px solid var(--border);
-    color: var(--text);
-    font-family: monospace;
-    font-size: 11px;
-    padding: 14px;
-    border-radius: 8px;
-    resize: vertical;
-    outline: none;
-  }
-
-  .modal-btns { display: flex; gap: 10px; margin-top: 14px; }
-
-  .modal-btns button {
-    font-family: 'Nunito', sans-serif;
-    font-size: 12px;
-    font-weight: 700;
-    padding: 8px 18px;
-    border-radius: 8px;
-    cursor: pointer;
-    border: 1.5px solid var(--border);
-    background: var(--bg);
-    color: var(--text-mid);
-    transition: all 0.15s;
-  }
-
-  .modal-btns button.primary { background: var(--coral); color: white; border-color: var(--coral); }
-  .modal-btns button:hover { opacity: 0.85; }
-
-  /* ── EVENT POPUP (calendar) ── */
-  .event-popup {
-    display: none;
-    position: fixed;
-    z-index: 300;
-    background: var(--white);
-    border-radius: 10px;
-    box-shadow: 0 8px 30px rgba(19,30,58,0.18);
-    padding: 16px;
-    min-width: 210px;
-    max-width: 260px;
-    border: 1px solid var(--border);
-  }
-
-  .event-popup.open { display: block; }
-  .event-popup-title { font-size: 14px; font-weight: 800; color: var(--navy); margin-bottom: 4px; padding-right: 24px; }
-  .event-popup-cycle { font-size: 11px; font-weight: 700; color: var(--text-dim); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
-
-  .popup-check-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--text-mid);
-    padding: 4px;
-    border-radius: 4px;
-    transition: background 0.1s;
-  }
-
-  .popup-check-row:hover { background: var(--bg); }
-
-  .event-popup-close {
-    position: absolute;
-    top: 8px; right: 8px;
-    background: none;
-    border: none;
-    font-size: 14px;
-    cursor: pointer;
-    color: var(--text-dim);
-    padding: 3px 7px;
-    border-radius: 4px;
-    line-height: 1;
-    font-weight: 700;
-  }
-
-  .event-popup-close:hover { background: var(--bg); color: var(--navy); }
-
-  /* ── FULLCALENDAR OVERRIDES ── */
-  #fullCalendarEl {
-    background: var(--white);
-    border-radius: 12px;
-    padding: 16px;
-    border: 1px solid var(--border);
-  }
-
-  .fc .fc-button-primary {
-    background-color: var(--navy) !important;
-    border-color: var(--navy) !important;
-    font-family: 'Nunito', sans-serif !important;
-    font-weight: 700 !important;
-    font-size: 12px !important;
-  }
-
-  .fc .fc-button-primary:hover {
-    background-color: var(--coral) !important;
-    border-color: var(--coral) !important;
-  }
-
-  .fc .fc-button-primary:not(:disabled).fc-button-active {
-    background-color: var(--coral) !important;
-    border-color: var(--coral) !important;
-  }
-
-  .fc .fc-toolbar-title {
-    font-family: 'Nunito', sans-serif !important;
-    font-weight: 900 !important;
-    color: var(--navy) !important;
-    font-size: 18px !important;
-  }
-
-  .fc .fc-daygrid-day-number { color: var(--navy); font-weight: 700; font-size: 13px; }
-  .fc .fc-col-header-cell-cushion { color: var(--navy); font-weight: 800; font-size: 12px; }
-
-  .fc-event {
-    border-radius: 4px !important;
-    font-family: 'Nunito', sans-serif !important;
-    font-size: 11px !important;
-    font-weight: 700 !important;
-    cursor: pointer !important;
-    border: none !important;
-    padding: 1px 4px !important;
-  }
-
-  .fc-event.ev-c1 { background-color: var(--c1) !important; }
-  .fc-event.ev-c2 { background-color: var(--c2) !important; }
-  .fc-event.ev-c3 { background-color: var(--c3) !important; }
-  .fc-event.ev-done { opacity: 0.38 !important; }
-
-  .cal-controls { display: flex; gap: 8px; margin-bottom: 16px; }
-
-  .cal-view-btn {
-    padding: 6px 14px;
-    font-family: 'Nunito', sans-serif;
-    font-size: 12px;
-    font-weight: 700;
-    border-radius: 6px;
-    border: 1.5px solid var(--border);
-    background: var(--white);
-    color: var(--text-dim);
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-
-  .cal-view-btn.active, .cal-view-btn:hover {
-    background: var(--navy);
-    border-color: var(--navy);
-    color: var(--white);
-  }
+/* ===== VARIABLES ===== */
+:root {
+  --navy: #131E3A;
+  --beige: #DDCDC2;
+  --coral: #FF5454;
+  --white: #FFFFFF;
+  --green: #27ae60;
+  --blue: #2980b9;
+  --orange: #e67e22;
+  --text: #131E3A;
+  --text-dim: #8892a4;
+  --text-mid: #4a5568;
+  --border: #e8edf2;
+  --bg: #f4f6f9;
+  --sidebar-w: 250px;
+  --radius: 10px;
+}
+
+/* ===== RESET ===== */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ===== LAYOUT ===== */
+.app { display: flex; min-height: 100vh; }
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--navy);
+  color: var(--white);
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: transform 0.25s ease;
+}
+
+.sidebar::-webkit-scrollbar { width: 3px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+
+.sidebar-brand {
+  padding: 22px 20px 4px;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.sidebar-sub {
+  padding: 4px 20px 16px;
+  font-size: 10px;
+  color: rgba(255,255,255,0.45);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  margin-bottom: 6px;
+}
+
+.sidebar-nav { padding: 8px 10px; }
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.6);
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-bottom: 2px;
+  user-select: none;
+}
+
+.nav-item:hover { background: rgba(255,255,255,0.08); color: var(--white); }
+.nav-item.active { background: var(--coral); color: var(--white); }
+.nav-icon { font-size: 14px; width: 18px; text-align: center; flex-shrink: 0; }
+
+.sidebar-section-title {
+  padding: 14px 20px 6px;
+  font-size: 9px;
+  font-weight: 800;
+  color: rgba(255,255,255,0.3);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.sidebar-systems { padding: 0 10px 24px; flex: 1; }
+
+.sys-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+  margin-bottom: 1px;
+}
+
+.sys-group-header:hover { background: rgba(255,255,255,0.07); }
+
+.sys-group-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.6);
+}
+
+.sys-group-count {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--coral);
+}
+
+.sys-group-topics { padding: 0 0 4px 18px; display: none; }
+.sys-group.open .sys-group-topics { display: block; }
+
+.sys-topic-link {
+  display: block;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.45);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.1s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sys-topic-link:hover { color: var(--white); background: rgba(255,255,255,0.05); }
+.sys-topic-link.done { color: rgba(39,174,96,0.7); }
+
+/* ===== MOBILE ===== */
+.mobile-header {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 52px;
+  background: var(--navy);
+  z-index: 90;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+}
+
+.mobile-header .hamburger {
+  background: none; border: none; color: var(--white);
+  font-size: 22px; cursor: pointer; padding: 4px;
+}
+
+.mobile-header .brand { font-size: 14px; font-weight: 800; color: var(--white); }
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 99;
+}
+
+@media (max-width: 768px) {
+  .mobile-header { display: flex; }
+  .sidebar { transform: translateX(-100%); z-index: 101; }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-overlay.open { display: block; }
+  .main { margin-left: 0 !important; padding-top: 64px !important; }
+}
+
+/* ===== MAIN ===== */
+.main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  padding: 24px 28px 56px;
+  min-height: 100vh;
+}
+
+.view { display: none; }
+.view.active { display: block; }
+
+.view-title {
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--navy);
+  margin-bottom: 20px;
+}
+
+/* ===== COUNTDOWN ===== */
+.countdown-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.countdown-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--navy);
+  border-radius: 10px;
+  padding: 10px 18px;
+}
+
+.countdown-num {
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--beige);
+  line-height: 1;
+}
+
+.countdown-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(255,255,255,0.5);
+  font-weight: 700;
+}
+
+.countdown-exam {
+  font-size: 12px;
+  color: var(--text-dim);
+  font-weight: 700;
+}
+
+/* ===== CARDS ===== */
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.1s;
+}
+
+.card-header:hover { background: #fafbfc; }
+
+.card-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--navy);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.card-count {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--white);
+  background: var(--coral);
+  border-radius: 10px;
+  padding: 2px 8px;
+  margin-left: 8px;
+}
+
+.card-chevron {
+  font-size: 11px;
+  color: var(--text-dim);
+  transition: transform 0.2s;
+}
+
+.card.collapsed .card-chevron { transform: rotate(-90deg); }
+.card.collapsed .card-body { display: none; }
+
+.card-body {
+  padding: 0 18px 16px;
+}
+
+/* ===== STAT ROWS ===== */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.stat-box {
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+
+.stat-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-dim);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.stat-val {
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--navy);
+  line-height: 1.1;
+}
+
+.stat-val.green { color: var(--green); }
+.stat-val.blue { color: var(--blue); }
+.stat-val.coral { color: var(--coral); }
+.stat-val.orange { color: var(--orange); }
+
+.stat-sub {
+  font-size: 11px;
+  color: var(--text-dim);
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+/* ===== PROGRESS BARS ===== */
+.progress-row {
+  margin-bottom: 14px;
+}
+
+.progress-row:last-child { margin-bottom: 0; }
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.progress-info .label { color: var(--text-mid); }
+.progress-info .pct { color: var(--navy); font-weight: 800; }
+
+.progress-track {
+  height: 10px;
+  background: var(--bg);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 0.4s ease;
+}
+
+.progress-fill.blue { background: var(--blue); }
+.progress-fill.orange { background: var(--orange); }
+.progress-fill.green { background: var(--green); }
+
+/* ===== DUE / UPCOMING LISTS ===== */
+.due-list { list-style: none; }
+
+.due-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  margin-bottom: 4px;
+  transition: background 0.1s;
+}
+
+.due-item:hover { background: var(--bg); }
+
+.due-item.overdue {
+  background: rgba(255,84,84,0.06);
+  border-left: 3px solid var(--coral);
+}
+
+.due-topic {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.due-badge {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.badge-c2 { background: rgba(41,128,185,0.1); color: var(--blue); }
+.badge-c3 { background: rgba(230,126,34,0.1); color: var(--orange); }
+.badge-overdue { background: rgba(255,84,84,0.12); color: var(--coral); }
+
+.due-date {
+  font-size: 11px;
+  color: var(--text-dim);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.due-mark-btn {
+  font-family: 'Nunito', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 5px;
+  border: 1.5px solid var(--green);
+  background: transparent;
+  color: var(--green);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+
+.due-mark-btn:hover { background: var(--green); color: var(--white); }
+
+.empty-msg {
+  font-size: 13px;
+  color: var(--text-dim);
+  font-weight: 600;
+  padding: 8px 0;
+  font-style: italic;
+}
+
+/* ===== LOG TOPICS VIEW ===== */
+.search-wrap {
+  position: relative;
+  margin-bottom: 18px;
+}
+
+.search-input {
+  width: 100%;
+  max-width: 400px;
+  padding: 10px 14px 10px 38px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--white);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.search-input:focus { border-color: var(--coral); }
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-dim);
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.log-system {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+
+.log-system-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.1s;
+}
+
+.log-system-header:hover { background: #fafbfc; }
+
+.log-system-name {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--navy);
+  flex: 1;
+}
+
+.log-system-progress {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-dim);
+}
+
+.log-system-chevron {
+  font-size: 11px;
+  color: var(--text-dim);
+  transition: transform 0.2s;
+}
+
+.log-system.collapsed .log-system-chevron { transform: rotate(-90deg); }
+.log-system.collapsed .log-system-body { display: none; }
+
+.log-system-body { border-top: 1px solid var(--border); }
+
+.log-topic-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.1s;
+}
+
+.log-topic-row:last-child { border-bottom: none; }
+.log-topic-row:hover { background: #fafbfc; }
+.log-topic-row.search-hidden { display: none; }
+
+.log-topic-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+  min-width: 0;
+}
+
+.log-cycle-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.cycle-pill {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.cycle-pill.done {
+  background: rgba(39,174,96,0.1);
+  color: var(--green);
+}
+
+.cycle-pill.due {
+  background: rgba(230,126,34,0.1);
+  color: var(--orange);
+}
+
+.cycle-pill.overdue {
+  background: rgba(255,84,84,0.12);
+  color: var(--coral);
+  font-weight: 900;
+}
+
+.cycle-pill.pending {
+  background: var(--bg);
+  color: var(--text-dim);
+}
+
+.cycle-pill.not-started {
+  background: transparent;
+  color: var(--border);
+}
+
+/* ===== YIELD BADGES ===== */
+.yield-tag {
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  margin-left: 6px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.yield-tag.high {
+  background: rgba(255,84,84,0.1);
+  color: var(--coral);
+}
+
+.yield-tag.low-med {
+  background: rgba(230,190,34,0.13);
+  color: #b8960f;
+}
+
+.yield-tag.low {
+  background: rgba(137,142,164,0.1);
+  color: var(--text-dim);
+}
+
+.td-yield-high { color: var(--coral); font-weight: 800; }
+.td-yield-lowmed { color: #b8960f; font-weight: 700; }
+.td-yield-low { color: var(--text-dim); }
+
+.log-c1-btn {
+  font-family: 'Nunito', sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 5px 12px;
+  border-radius: 6px;
+  border: none;
+  background: var(--coral);
+  color: var(--white);
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.log-c1-btn:hover { opacity: 0.85; transform: scale(1.02); }
+
+.log-done-btn {
+  font-family: 'Nunito', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1.5px solid var(--green);
+  background: transparent;
+  color: var(--green);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.log-done-btn:hover { background: var(--green); color: var(--white); }
+
+.log-undo-btn {
+  font-family: 'Nunito', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.log-undo-btn:hover { border-color: var(--coral); color: var(--coral); }
+
+/* ===== DATE PICKER INLINE ===== */
+.date-pick-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  flex-shrink: 0;
+}
+
+.date-pick-group .log-c1-btn {
+  border-radius: 6px 0 0 6px;
+}
+
+.date-pick-toggle {
+  font-family: 'Nunito', sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 5px 7px;
+  border-radius: 0 6px 6px 0;
+  border: none;
+  background: var(--navy);
+  color: var(--white);
+  cursor: pointer;
+  transition: all 0.15s;
+  line-height: 1;
+}
+
+.date-pick-toggle:hover { opacity: 0.85; }
+
+.date-pick-wrap {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.date-pick-wrap.open { display: inline-flex; }
+
+.date-pick-input {
+  font-family: 'Nunito', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  outline: none;
+  width: 130px;
+}
+
+.date-pick-input:focus { border-color: var(--coral); }
+
+.date-pick-confirm {
+  font-family: 'Nunito', sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 5px;
+  border: none;
+  background: var(--green);
+  color: var(--white);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.date-pick-confirm:hover { opacity: 0.85; }
+
+.date-pick-cancel {
+  font-family: 'Nunito', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 5px;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.date-pick-cancel:hover { border-color: var(--coral); color: var(--coral); }
+
+/* ===== ALL TOPICS TABLE ===== */
+.table-controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  align-items: center;
+}
+
+.table-controls .search-input { max-width: 240px; }
+
+.table-controls select {
+  font-family: 'Nunito', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 8px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  background: var(--white);
+  color: var(--text);
+  outline: none;
+  cursor: pointer;
+}
+
+.table-wrap {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow-x: auto;
+}
+
+.topics-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.topics-table th {
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-dim);
+  background: #fafbfc;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.topics-table th:hover { color: var(--navy); }
+.topics-table th .sort-arrow { margin-left: 4px; font-size: 9px; }
+
+.topics-table td {
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.topics-table tr:last-child td { border-bottom: none; }
+.topics-table tr:hover td { background: #fafbfc; }
+.topics-table .table-hidden { display: none; }
+
+.td-done { color: var(--green); }
+.td-due { color: var(--orange); }
+.td-overdue { color: var(--coral); font-weight: 800; }
+.td-pending { color: var(--text-dim); }
+.td-na { color: var(--border); }
+
+/* ===== AUTOSAVE INDICATOR ===== */
+.save-indicator {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: var(--green);
+  color: var(--white);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 8px 14px;
+  border-radius: 8px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 200;
+  pointer-events: none;
+}
+
+.save-indicator.visible { opacity: 1; }
+
+/* ===== LOADING ===== */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: #0f1b2d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.loading-overlay .text {
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid rgba(255,255,255,0.2);
+  border-top-color: #ff5454;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ===== RESPONSIVE TWEAKS ===== */
+@media (max-width: 768px) {
+  .main { padding: 16px 14px 56px; }
+  .view-title { font-size: 18px; }
+  .stat-grid { grid-template-columns: 1fr 1fr; }
+  .log-topic-row { flex-wrap: wrap; gap: 6px; }
+  .log-cycle-status { width: 100%; justify-content: flex-start; }
+  .table-controls { flex-direction: column; }
+  .table-controls .search-input { max-width: 100%; }
+}
 </style>
-
-  <!-- Firebase -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyCZExbplcK6QMTHsLBuWuLHc6yLssoXQKw",
-      authDomain: "pebc-track.firebaseapp.com",
-      projectId: "pebc-track",
-      storageBucket: "pebc-track.firebasestorage.app",
-      messagingSenderId: "113666358336",
-      appId: "1:113666358336:web:50d4c3ba1a8cbb6759b3a5"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const DOC_REF = doc(db, "tracker", "rohan-pebc-2026");
-
-    // Expose to global scope for use by non-module scripts
-    window._db = db;
-    window._docRef = DOC_REF;
-    window._firestoreReady = false;
-
-    window._saveToFirestore = async function(stateObj) {
-      try {
-        await setDoc(DOC_REF, { state: JSON.stringify(stateObj) });
-      } catch(e) {
-        console.warn("Firestore save failed, using localStorage fallback", e);
-        try { localStorage.setItem('pebc_tracker_v2', JSON.stringify(stateObj)); } catch(_) {}
-      }
-    };
-
-    // Load state from Firestore on startup, then initialise the app
-    async function init() {
-      let loadedState = {};
-      try {
-        const snap = await getDoc(DOC_REF);
-        if (snap.exists()) {
-          loadedState = JSON.parse(snap.data().state || '{}');
-        }
-      } catch(e) {
-        console.warn("Firestore load failed, falling back to localStorage", e);
-        try {
-          const raw = localStorage.getItem('pebc_tracker_v2');
-          if (raw) loadedState = JSON.parse(raw);
-        } catch(_) {}
-      }
-
-      // Apply pre-marks for completed topics
-      if (!loadedState['Orientation|c1']) loadedState['Orientation|c1'] = true;
-      if (!loadedState['Exam Overview & Study Strategies|c1']) loadedState['Exam Overview & Study Strategies|c1'] = true;
-      if (!loadedState['Principles of Infection & Antimicrobial Therapy|c1']) loadedState['Principles of Infection & Antimicrobial Therapy|c1'] = true;
-      if (!loadedState['Acute Otitis Media|c1']) loadedState['Acute Otitis Media|c1'] = true;
-
-      window._firestoreReady = true;
-      window.state = loadedState;
-
-      // Signal the main script that state is ready
-      document.dispatchEvent(new CustomEvent('firebaseReady'));
-    }
-
-    init();
-  </script>
 </head>
 <body>
-  <div id="loadingOverlay" style="
-    position:fixed;inset:0;background:#0f1b2d;
-    display:flex;align-items:center;justify-content:center;
-    z-index:9999;flex-direction:column;gap:16px;">
-    <div style="color:#fff;font-size:18px;font-weight:700;font-family:sans-serif;">Loading your tracker...</div>
-    <div style="width:48px;height:48px;border:4px solid rgba(255,255,255,0.2);
-      border-top-color:#ff5454;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
-    <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
-  </div>
-<div class="app-layout">
 
-  <!-- ══ SIDEBAR ══ -->
-  <aside class="sidebar">
+<!-- Loading -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="text">Loading your tracker...</div>
+  <div class="spinner"></div>
+</div>
+
+<!-- Mobile Header -->
+<div class="mobile-header">
+  <button class="hamburger" onclick="toggleMobileMenu()">&#9776;</button>
+  <span class="brand">PEBC MCQ 2026</span>
+</div>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMobileMenu()"></div>
+
+<div class="app">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">PEBC MCQ 2026</div>
-    <div class="sidebar-sub">Rohan · Study Tracker</div>
+    <div class="sidebar-sub">Rohan &middot; Study Tracker</div>
     <nav class="sidebar-nav">
-      <a class="nav-item active" id="navTable" onclick="switchTab('table');return false;" href="#">
-        <span class="nav-icon">☰</span> Schedule
-      </a>
-      <a class="nav-item" id="navCalendar" onclick="switchTab('calendar');return false;" href="#">
-        <span class="nav-icon">&#128197;</span> Calendar
-      </a>
+      <div class="nav-item active" data-view="dashboard" onclick="switchView('dashboard')">
+        <span class="nav-icon">&#9632;</span> Dashboard
+      </div>
+      <div class="nav-item" data-view="log" onclick="switchView('log')">
+        <span class="nav-icon">&#10003;</span> Log Topics
+      </div>
+      <div class="nav-item" data-view="all" onclick="switchView('all')">
+        <span class="nav-icon">&#9776;</span> All Topics
+      </div>
     </nav>
-    <div class="sidebar-section-title">Weeks</div>
-    <div class="sidebar-weeks" id="sidebarWeeks"></div>
+    <div class="sidebar-section-title">Systems</div>
+    <div class="sidebar-systems" id="sidebarSystems"></div>
   </aside>
 
-  <!-- ══ MAIN AREA ══ -->
-  <div class="main-area">
+  <!-- Main -->
+  <div class="main">
+    <!-- Dashboard -->
+    <section class="view active" id="view-dashboard">
+      <div class="view-title">Dashboard</div>
+      <div class="countdown-bar" id="countdownBar"></div>
+      <div id="cardPace"></div>
+      <div id="cardDueToday"></div>
+      <div id="cardUpcoming"></div>
+      <div id="cardProgress"></div>
+    </section>
 
-    <!-- Header Bar -->
-    <header class="main-header">
-      <div class="header-left">
-        <div class="header-week-title" id="headerWeekTitle">PEBC MCQ 2026 — Study Tracker</div>
-        <div class="header-week-dates" id="headerWeekDates">Exam: May 19, 2026</div>
-      </div>
-      <div class="header-search">
+    <!-- Log Topics -->
+    <section class="view" id="view-log">
+      <div class="view-title">Log Topics</div>
+      <div class="search-wrap">
         <span class="search-icon">&#128269;</span>
-        <input type="search" class="search-input" id="searchBar"
-          placeholder="Search topics…" oninput="searchTopics(this.value)">
+        <input type="text" class="search-input" id="logSearch" placeholder="Search topics..." oninput="filterLogTopics(this.value)">
       </div>
-      <div class="progress-ring-wrap">
-        <div class="ring-labels">
-          <div class="ring-pct" id="ringPct">0%</div>
-          <div class="ring-sub">C1 Done</div>
+      <div id="logContainer"></div>
+    </section>
+
+    <!-- All Topics -->
+    <section class="view" id="view-all">
+      <div class="view-title">All Topics</div>
+      <div class="table-controls">
+        <div class="search-wrap" style="margin-bottom:0">
+          <span class="search-icon">&#128269;</span>
+          <input type="text" class="search-input" id="allSearch" placeholder="Filter topics..." oninput="filterAllTopics()">
         </div>
-        <svg class="ring-svg" width="48" height="48" viewBox="0 0 48 48">
-          <circle class="ring-track" cx="24" cy="24" r="19"/>
-          <circle class="ring-fill r-c1" id="ringFillC1" cx="24" cy="24" r="19"
-            stroke-dasharray="119.38" stroke-dashoffset="119.38"/>
-        </svg>
+        <select id="allFilterSystem" onchange="filterAllTopics()">
+          <option value="">All Systems</option>
+        </select>
+        <select id="allFilterYield" onchange="filterAllTopics()">
+          <option value="">All Yields</option>
+          <option value="high">High</option>
+          <option value="low-med">Low-Med</option>
+          <option value="low">Low</option>
+        </select>
+        <select id="allFilterStatus" onchange="filterAllTopics()">
+          <option value="">All Statuses</option>
+          <option value="not-started">Not Started</option>
+          <option value="c1-done">C1 Done</option>
+          <option value="c2-due">C2 Due/Overdue</option>
+          <option value="c2-done">C2 Done</option>
+          <option value="c3-due">C3 Due/Overdue</option>
+          <option value="c3-done">C3 Done (Complete)</option>
+        </select>
       </div>
-      <div class="countdown-chip">
-        <div class="days-num" id="daysLeft">—</div>
-        <div class="days-label">days left</div>
+      <div class="table-wrap">
+        <table class="topics-table" id="allTable">
+          <thead>
+            <tr>
+              <th data-col="topic" onclick="sortAllTopics('topic')">Topic <span class="sort-arrow"></span></th>
+              <th data-col="yield" onclick="sortAllTopics('yield')">Yield <span class="sort-arrow"></span></th>
+              <th data-col="system" onclick="sortAllTopics('system')">System <span class="sort-arrow"></span></th>
+              <th data-col="c1" onclick="sortAllTopics('c1')">C1 Date <span class="sort-arrow"></span></th>
+              <th data-col="c2due" onclick="sortAllTopics('c2due')">C2 Due <span class="sort-arrow"></span></th>
+              <th data-col="c2done" onclick="sortAllTopics('c2done')">C2 Done <span class="sort-arrow"></span></th>
+              <th data-col="c3due" onclick="sortAllTopics('c3due')">C3 Due <span class="sort-arrow"></span></th>
+              <th data-col="c3done" onclick="sortAllTopics('c3done')">C3 Done <span class="sort-arrow"></span></th>
+            </tr>
+          </thead>
+          <tbody id="allTableBody"></tbody>
+        </table>
       </div>
-    </header>
-
-    <!-- Tab Bar -->
-    <div class="tab-bar">
-      <button class="tab-btn active" id="tabBtnTable" onclick="switchTab('table')">Table View</button>
-      <button class="tab-btn" id="tabBtnCalendar" onclick="switchTab('calendar')">Calendar View</button>
-    </div>
-
-    <!-- ── TABLE TAB ── -->
-    <div class="tab-content active" id="tabTable">
-
-      <div class="stats-strip">
-        <div class="stat-pill p-c1">
-          <div class="sp-label">C1 Done</div>
-          <div class="sp-val" id="c1stat">0 <span>/ 95</span></div>
-        </div>
-        <div class="stat-pill p-c2">
-          <div class="sp-label">C2 Done</div>
-          <div class="sp-val" id="c2stat">0 <span>/ 95</span></div>
-        </div>
-        <div class="stat-pill p-c3">
-          <div class="sp-label">C3 Done</div>
-          <div class="sp-val" id="c3stat">0 <span>/ 95</span></div>
-        </div>
-        <div class="stat-pill">
-          <div class="sp-label">Fully Done</div>
-          <div class="sp-val" id="fullstat">0 <span>/ 95</span></div>
-        </div>
-        <div class="stat-pill">
-          <div class="sp-label">On Track</div>
-          <div class="sp-val" id="ontrack" style="font-size:16px">—</div>
-        </div>
-      </div>
-
-      <div class="progress-wrap">
-        <div class="progress-label-row">
-          <span>Progress (C1 / C2 / C3)</span>
-          <span id="pctLabel">0%</span>
-        </div>
-        <div class="progress-track">
-          <div class="progress-fill c1" id="bar1" style="width:0%"></div>
-          <div class="progress-fill c2" id="bar2" style="width:0%"></div>
-          <div class="progress-fill c3" id="bar3" style="width:0%"></div>
-        </div>
-      </div>
-
-      <div class="legend-row">
-        <div class="legend-item"><div class="legend-dot" style="background:var(--c1)"></div> C1 — Learn</div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--c2)"></div> C2 — Review</div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--c3)"></div> C3 — Rapid Refresh</div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--c2);opacity:0.5"></div> Quiz Day</div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--coral);opacity:0.6"></div> Mock Exam</div>
-      </div>
-
-      <div class="controls-row">
-        <button class="filter-btn active" onclick="filterWeeks('all', this)">All</button>
-        <button class="filter-btn" onclick="filterWeeks('current', this)">This Week</button>
-        <button class="filter-btn" onclick="filterWeeks('incomplete', this)">Incomplete</button>
-        <button class="export-btn" onclick="openExport()">&#8679; Export Markdown</button>
-        <span id="autosaveIndicator">✓ Saved</span>
-      </div>
-
-      <div id="schedule"></div>
-    </div>
-
-    <!-- ── CALENDAR TAB ── -->
-    <div class="tab-content" id="tabCalendar">
-      <div class="cal-controls">
-        <button class="cal-view-btn active" id="calBtnMonth" onclick="setCalView('dayGridMonth', this)">Month View</button>
-        <button class="cal-view-btn" id="calBtnWeek" onclick="setCalView('timeGridWeek', this)">Week View</button>
-      </div>
-      <div id="fullCalendarEl"></div>
-    </div>
-
-  </div><!-- end .main-area -->
-</div><!-- end .app-layout -->
-
-<!-- Event Popup -->
-<div class="event-popup" id="eventPopup">
-  <button class="event-popup-close" onclick="closeEventPopup()">&#10005;</button>
-  <div class="event-popup-title" id="popupTitle"></div>
-  <div class="event-popup-cycle" id="popupCycle"></div>
-  <div class="popup-check-row" onclick="togglePopupTopic()">
-    <div class="cycle-check" id="popupCheck"></div>
-    <span>Mark complete</span>
+    </section>
   </div>
 </div>
 
-<!-- Export Modal -->
-<div class="modal-overlay" id="exportModal">
-  <div class="modal">
-    <h2>Export to Obsidian</h2>
-    <textarea id="exportText" readonly></textarea>
-    <div class="modal-btns">
-      <button class="primary" onclick="copyExport()">Copy to Clipboard</button>
-      <button onclick="closeExport()">Close</button>
-    </div>
-  </div>
-</div>
+<!-- Save indicator -->
+<div class="save-indicator" id="saveIndicator">Saved</div>
+
+<!-- Firebase -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCZExbplcK6QMTHsLBuWuLHc6yLssoXQKw",
+    authDomain: "pebc-track.firebaseapp.com",
+    projectId: "pebc-track",
+    storageBucket: "pebc-track.firebasestorage.app",
+    messagingSenderId: "113666358336",
+    appId: "1:113666358336:web:50d4c3ba1a8cbb6759b3a5"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const DOC_REF = doc(db, "tracker", "rohan-pebc-2026");
+
+  window._saveToFirestore = async function(stateObj) {
+    try {
+      await setDoc(DOC_REF, { state: JSON.stringify(stateObj) });
+    } catch(e) {
+      console.warn("Firestore save failed, using localStorage fallback", e);
+      try { localStorage.setItem('pebc_tracker_v3', JSON.stringify(stateObj)); } catch(_) {}
+    }
+  };
+
+  async function init() {
+    let loadedState = {};
+    try {
+      const snap = await getDoc(DOC_REF);
+      if (snap.exists()) {
+        loadedState = JSON.parse(snap.data().state || '{}');
+      }
+    } catch(e) {
+      console.warn("Firestore load failed, falling back to localStorage", e);
+      try {
+        const raw = localStorage.getItem('pebc_tracker_v3') || localStorage.getItem('pebc_tracker_v2');
+        if (raw) loadedState = JSON.parse(raw);
+      } catch(_) {}
+    }
+
+    // Migrate old boolean format to date format
+    loadedState = window._migrateState(loadedState);
+
+    // Apply pre-marks
+    if (!loadedState['Acute Otitis Media|c1']) loadedState['Acute Otitis Media|c1'] = '2026-03-01';
+    if (!loadedState['Principles of Infection & Antimicrobial Therapy|c1']) loadedState['Principles of Infection & Antimicrobial Therapy|c1'] = '2026-03-01';
+
+    window.state = loadedState;
+    document.dispatchEvent(new CustomEvent('firebaseReady'));
+  }
+
+  init();
+</script>
 
 <script>
-// ─── DATA ────────────────────────────────────────────────────────────────────
+// ===== TOPIC DATA =====
+const SYSTEMS = {
+  "Infectious Disease": [
+    "Pneumonia", "UTIs", "HSV", "STIs", "Sinusitis", "Meningitis",
+    "Fungal Infections", "Tick-Borne Infections", "Pharyngitis & Bronchitis",
+    "ID Drug Charts", "Acute Otitis Media",
+    "Principles of Infection & Antimicrobial Therapy", "Influenza"
+  ],
+  "Cardio": [
+    "Hypertension", "Dyslipidemia", "ACS & Stable Angina", "Atrial Fibrillation",
+    "Stroke & TIA", "DVT & PE", "Heart Failure", "Warfarin Dosing", "CVD Drug Charts"
+  ],
+  "Endocrine": ["Hypothyroidism", "Diabetes", "Diabetes Drug Chart"],
+  "Renal": ["AKI", "CKD"],
+  "Dermatology": ["Atopic Dermatitis", "Lice & Scabies", "Acne", "Rosacea"],
+  "Eye Health": ["Glaucoma", "Eye Health"],
+  "Pharmacy Practice": [
+    "Ethics", "Canadian Healthcare System", "Federal Law", "Pharmacy Management 1",
+    "Safety & Documentation", "Patient Assessment", "DEI",
+    "Intra/Interprofessional Collaboration", "EBM & Study Design", "Emergency Preparedness"
+  ],
+  "Pharmacokinetics": [
+    "PK/Biopharmaceutics 1", "PK/Biopharmaceutics 2",
+    "Pharmacy Calculations 1", "Pharmacy Calculations 2", "Drug Interactions"
+  ],
+  "Respiratory": [
+    "Asthma", "COPD", "Smoking Cessation", "Asthma & COPD Drug Charts", "Allergic Rhinitis"
+  ],
+  "Psychiatry": [
+    "Depression", "Anxiety", "Schizophrenia", "Bipolar Disorder",
+    "Insomnia", "ADHD", "Dementia", "Mental Health Drug Charts"
+  ],
+  "GI": [
+    "GERD/Dyspepsia/PUD", "Constipation", "Diarrhea",
+    "Nausea & Vomiting", "Pancreatitis", "UC & Crohn's Disease"
+  ],
+  "Women's Health / GU": [
+    "Women's Health", "Contraception", "Menopause",
+    "Erectile Dysfunction", "Urinary Incontinence", "Transgender Health"
+  ],
+  "MSK / Neuro": [
+    "Osteoporosis", "Rheumatoid Arthritis", "Gout", "Osteoarthritis",
+    "MSK Pain", "Parkinson's Disease", "Pain Mgmt & Palliative Care",
+    "Headache & Migraine", "Seizures", "Pain Management Drug Charts"
+  ],
+  "Oncology / Heme": [
+    "Oncology", "CINV", "Common Anemias", "Electrolyte Disorders"
+  ],
+  "Other": [
+    "Travel Medicine", "Cannabis", "Fever",
+    "HIV & Opportunistic Infections (incl. PEP/PrEP)",
+    "Opioid & Alcohol Use Disorder", "Sepsis & Septic Shock",
+    "Drug-induced Pulmonary Toxicity", "Acute Agitation", "Hepatic Encephalopathy"
+  ]
+};
 
-const TOTAL = 95;
-const EXAM_DATE = new Date('2026-05-19');
+// Yield / priority mapping: 'high' = Med-High, 'low-med' = Low-Med, 'low' = Low
+const TOPIC_YIELD = {
+  // Med-High yield
+  "Hypertension": "high", "Dyslipidemia": "high", "ACS & Stable Angina": "high",
+  "Stroke & TIA": "high", "Pharmacy Calculations 1": "high",
+  "Atrial Fibrillation": "high", "DVT & PE": "high", "Heart Failure": "high",
+  "AKI": "high", "CKD": "high", "CVD Drug Charts": "high", "Warfarin Dosing": "high",
+  "Atopic Dermatitis": "high", "Lice & Scabies": "high",
+  "Acne": "high", "Rosacea": "high", "Diabetes": "high", "Diabetes Drug Chart": "high",
+  "ID Drug Charts": "high", "Eye Health": "high", "Glaucoma": "high",
+  "Principles of Infection & Antimicrobial Therapy": "high",
+  "Pneumonia": "high", "UTIs": "high", "HSV": "high",
+  "Pharmacy Calculations 2": "high", "STIs": "high", "Sinusitis": "high",
+  "Meningitis": "high", "Fungal Infections": "high", "Tick-Borne Infections": "high",
+  "Pharyngitis & Bronchitis": "high",
+  "Ethics": "high", "Canadian Healthcare System": "high", "Federal Law": "high",
+  "Pharmacy Management 1": "high", "Safety & Documentation": "high",
+  "Patient Assessment": "high", "Influenza": "high", "Acute Otitis Media": "high",
+  "DEI": "high", "Intra/Interprofessional Collaboration": "high",
+  "EBM & Study Design": "high",
+  "Asthma": "high", "COPD": "high", "Smoking Cessation": "high",
+  "Depression": "high", "Anxiety": "high",
+  "Asthma & COPD Drug Charts": "high", "Oncology": "high", "CINV": "high",
+  "Common Anemias": "high", "Allergic Rhinitis": "high", "Drug Interactions": "high",
+  "Schizophrenia": "high", "ADHD": "high", "Dementia": "high",
+  "Mental Health Drug Charts": "high", "Electrolyte Disorders": "high",
+  "Travel Medicine": "high",
+  "GERD/Dyspepsia/PUD": "high", "Erectile Dysfunction": "high",
+  "Contraception": "high", "Constipation": "high", "Diarrhea": "high",
+  "Nausea & Vomiting": "high", "Menopause": "high", "Pancreatitis": "high",
+  "Osteoporosis": "high", "Rheumatoid Arthritis": "high", "Osteoarthritis": "high",
+  "Parkinson's Disease": "high", "Pain Mgmt & Palliative Care": "high",
+  "Headache & Migraine": "high", "Seizures": "high",
+  "Opioid & Alcohol Use Disorder": "high", "Pain Management Drug Charts": "high",
+  "Emergency Preparedness": "high",
+  // Low-Med yield
+  "Hypothyroidism": "low-med", "PK/Biopharmaceutics 1": "low-med",
+  "PK/Biopharmaceutics 2": "low-med", "Bipolar Disorder": "low-med",
+  "Insomnia": "low-med", "Women's Health": "low-med",
+  "UC & Crohn's Disease": "low-med", "Gout": "low-med", "MSK Pain": "low-med",
+  // Low yield
+  "HIV & Opportunistic Infections (incl. PEP/PrEP)": "low",
+  "Sepsis & Septic Shock": "low", "Transgender Health": "low",
+  "Cannabis": "low", "Fever": "low", "Drug-induced Pulmonary Toxicity": "low",
+  "Acute Agitation": "low", "Hepatic Encephalopathy": "low",
+  "Urinary Incontinence": "low"
+};
 
-const scheduleData = [
-  {
-    week: 1, title: "Infectious Diseases — Completion", dates: "Mar 3 – Mar 9",
-    startDate: "2026-03-03",
-    days: [
-      { label: "Tue", date: "Mar 3",  learn: ["Pneumonia", "UTIs", "HSV"], c2: ["Acute Otitis Media", "Principles of Infection & Antimicrobial Therapy"], c3: [] },
-      { label: "Wed", date: "Mar 4",  learn: ["STIs", "Sinusitis", "Meningitis"], c2: ["Pneumonia", "UTIs", "HSV"], c3: [] },
-      { label: "Thu", date: "Mar 5",  learn: ["Fungal Infections", "Tick-Borne Infections"], c2: ["STIs"], c3: [] },
-      { label: "Fri", date: "Mar 6",  learn: ["Pharyngitis & Bronchitis", "ID Drug Charts", "Eye Health"], c2: ["Sinusitis"], c3: [] },
-      { label: "Sat", date: "Mar 7",  learn: ["Glaucoma", "Hypertension", "Dyslipidemia", "PK/Biopharmaceutics 1"], c2: ["Meningitis", "Fungal Infections", "Tick-Borne Infections"], c3: [] },
-      { label: "Sun", date: "Mar 8",  learn: ["ACS & Stable Angina", "Atrial Fibrillation", "Stroke & TIA", "PK/Biopharmaceutics 2"], c2: ["Pharyngitis & Bronchitis", "ID Drug Charts", "Eye Health"], c3: ["Pneumonia", "UTIs", "HSV"] },
-      { label: "Mon", date: "Mar 9",  learn: ["DVT & PE", "Heart Failure", "Warfarin Dosing", "Hypothyroidism"], c2: ["Glaucoma", "Hypertension", "Dyslipidemia", "PK/Biopharmaceutics 1"], c3: ["STIs", "Sinusitis", "Meningitis"] },
-    ]
-  },
-  {
-    week: 2, title: "Cardio + Renal + Derm + Endo", dates: "Mar 10 – Mar 16",
-    startDate: "2026-03-10",
-    days: [
-      { label: "Tue", date: "Mar 10", learn: ["AKI", "CKD", "CVD Drug Charts", "Atopic Dermatitis"], c2: ["ACS & Stable Angina", "Atrial Fibrillation", "Stroke & TIA", "PK/Biopharmaceutics 2"], c3: ["Fungal Infections", "Tick-Borne Infections", "Pharyngitis & Bronchitis", "Acute Otitis Media", "Principles of Infection & Antimicrobial Therapy"] },
-      { label: "Wed", date: "Mar 11", learn: ["Lice & Scabies", "Acne", "Rosacea", "Diabetes"], c2: ["DVT & PE", "Heart Failure", "Warfarin Dosing", "Hypothyroidism"], c3: ["ID Drug Charts", "Eye Health", "Glaucoma"] },
-      { label: "Thu", date: "Mar 12", learn: ["Diabetes Drug Chart", "Pharmacy Calculations 1"], c2: ["AKI"], c3: [] },
-      { label: "Fri", date: "Mar 13", learn: ["Ethics", "Canadian Healthcare System", "Federal Law"], c2: ["CKD"], c3: [] },
-      { label: "Sat", date: "Mar 14", learn: ["Pharmacy Management 1", "Safety & Documentation", "Patient Assessment", "Influenza"], c2: ["Atopic Dermatitis", "Lice & Scabies", "Acne", "Rosacea"], c3: ["ACS & Stable Angina", "Atrial Fibrillation", "Stroke & TIA"] },
-      { label: "Sun", date: "Mar 15", learn: ["Pharmacy Calculations 2", "DEI", "Intra/Interprofessional Collaboration", "EBM & Study Design"], c2: ["Diabetes", "Diabetes Drug Chart", "Pharmacy Calculations 1", "Ethics"], c3: ["DVT & PE", "Heart Failure", "Warfarin Dosing"] },
-      { label: "Mon", date: "Mar 16", learn: ["Emergency Preparedness", "Asthma", "COPD", "Smoking Cessation"], c2: ["Canadian Healthcare System", "Federal Law", "Pharmacy Management 1", "Safety & Documentation"], c3: ["AKI", "CKD", "CVD Drug Charts", "Atopic Dermatitis"] },
-    ]
-  },
-  {
-    week: 3, title: "Resp + Psych + GI Start", dates: "Mar 17 – Mar 23",
-    startDate: "2026-03-17",
-    days: [
-      { label: "Tue", date: "Mar 17", learn: ["Asthma & COPD Drug Charts", "Allergic Rhinitis", "Drug Interactions", "Depression"], c2: ["Patient Assessment", "Influenza", "Pharmacy Calculations 2", "DEI"], c3: ["Lice & Scabies", "Acne", "Rosacea", "Diabetes"] },
-      { label: "Wed", date: "Mar 18", learn: ["Anxiety", "Schizophrenia", "Bipolar Disorder", "Insomnia"], c2: ["Intra/Interprofessional Collaboration", "EBM & Study Design", "Emergency Preparedness", "Asthma"], c3: ["Diabetes Drug Chart", "Pharmacy Calculations 1", "Ethics", "Canadian Healthcare System"] },
-      { label: "Thu", date: "Mar 19", learn: ["ADHD", "Dementia"], c2: ["COPD"], c3: [] },
-      { label: "Fri", date: "Mar 20", learn: ["Mental Health Drug Charts", "Oncology", "CINV"], c2: ["Smoking Cessation"], c3: [] },
-      { label: "Sat", date: "Mar 21", learn: ["Common Anemias", "Electrolyte Disorders", "Travel Medicine", "Women's Health"], c2: ["Asthma & COPD Drug Charts", "Allergic Rhinitis", "Drug Interactions", "Depression"], c3: ["Federal Law", "Pharmacy Management 1", "Safety & Documentation", "Patient Assessment"], notes: "📋 PharmAchieve Quiz: ID + Cardio + Renal this weekend" },
-      { label: "Sun", date: "Mar 22", learn: ["GERD/Dyspepsia/PUD", "Erectile Dysfunction", "Contraception", "Constipation"], c2: ["Anxiety", "Schizophrenia", "Bipolar Disorder", "Insomnia"], c3: ["Influenza", "Pharmacy Calculations 2", "DEI", "Intra/Interprofessional Collaboration"] },
-      { label: "Mon", date: "Mar 23", learn: ["Diarrhea", "Nausea & Vomiting", "Menopause", "Pancreatitis"], c2: ["ADHD", "Dementia", "Mental Health Drug Charts", "Oncology"], c3: ["EBM & Study Design", "Emergency Preparedness", "Asthma", "COPD"] },
-    ]
-  },
-  {
-    week: 4, title: "GI + GU + MSK + High-Value Buffer", dates: "Mar 24 – Mar 30",
-    startDate: "2026-03-24",
-    days: [
-      { label: "Tue", date: "Mar 24", learn: ["UC & Crohn's Disease", "Osteoporosis", "Rheumatoid Arthritis", "Gout"], c2: ["CINV", "Common Anemias", "Electrolyte Disorders", "Travel Medicine"], c3: ["Smoking Cessation", "Asthma & COPD Drug Charts", "Allergic Rhinitis", "Drug Interactions"] },
-      { label: "Wed", date: "Mar 25", learn: ["Osteoarthritis", "MSK Pain", "Parkinson's Disease", "Pain Mgmt & Palliative Care"], c2: ["Women's Health", "GERD/Dyspepsia/PUD", "Erectile Dysfunction", "Contraception"], c3: ["Depression", "Anxiety", "Schizophrenia"] },
-      { label: "Thu", date: "Mar 26", learn: ["Headache & Migraine", "Seizures"], c2: ["Constipation"], c3: [] },
-      { label: "Fri", date: "Mar 27", learn: ["Opioid & Alcohol Use Disorder", "Pain Management Drug Charts", "Sepsis & Septic Shock"], c2: ["Diarrhea"], c3: [] },
-      { label: "Sat", date: "Mar 28", learn: ["HIV & Opportunistic Infections (incl. PEP/PrEP)", "Transgender Health", "Cannabis", "Fever"], c2: ["Nausea & Vomiting", "Menopause", "Pancreatitis", "UC & Crohn's Disease"], c3: ["ADHD", "Dementia", "Mental Health Drug Charts", "Oncology"] },
-      { label: "Sun", date: "Mar 29", learn: ["Urinary Incontinence", "Drug-induced Pulmonary Toxicity", "Acute Agitation", "Hepatic Encephalopathy"], c2: ["Osteoporosis", "Rheumatoid Arthritis", "Gout", "Osteoarthritis"], c3: ["CINV", "Common Anemias", "Electrolyte Disorders", "Travel Medicine"], notes: "Buffer topics — skip if behind on core" },
-      { label: "Mon", date: "Mar 30", learn: [], c2: ["MSK Pain", "Parkinson's Disease", "Pain Mgmt & Palliative Care", "Women's Health"], c3: ["GERD/Dyspepsia/PUD", "Erectile Dysfunction", "Contraception", "Constipation"] },
-    ]
-  },
-  {
-    week: 5, title: "Consolidation + C2/C3 Catch-Up", dates: "Mar 31 – Apr 5",
-    startDate: "2026-03-31",
-    days: [
-      { label: "Tue", date: "Mar 31", learn: [], c2: ["Headache & Migraine", "Seizures", "Opioid & Alcohol Use Disorder", "Pain Management Drug Charts"], c3: ["Diarrhea", "Nausea & Vomiting", "Menopause", "Pancreatitis"] },
-      { label: "Wed", date: "Apr 1",  learn: [], c2: ["Sepsis & Septic Shock", "HIV & Opportunistic Infections (incl. PEP/PrEP)", "Transgender Health", "Cannabis"], c3: ["UC & Crohn's Disease", "Osteoporosis", "Rheumatoid Arthritis", "Gout"] },
-      { label: "Thu", date: "Apr 2",  learn: [], c2: ["Fever", "Urinary Incontinence"], c3: ["Osteoarthritis", "MSK Pain"] },
-      { label: "Fri", date: "Apr 3",  learn: [], c2: ["Drug-induced Pulmonary Toxicity", "Acute Agitation", "Hepatic Encephalopathy"], c3: ["Parkinson's Disease", "Pain Mgmt & Palliative Care", "Headache & Migraine"], notes: "📋 PharmAchieve Quiz: Derm + Law/Ethics/Mgmt + Psych + EBM this weekend" },
-      { label: "Sat", date: "Apr 4",  learn: [], c2: [], c3: ["Seizures", "Opioid & Alcohol Use Disorder", "Pain Management Drug Charts", "Sepsis & Septic Shock", "HIV & Opportunistic Infections (incl. PEP/PrEP)", "Transgender Health", "Cannabis", "Fever", "Urinary Incontinence"], notes: "Pure review day — no new C1" },
-      { label: "Sun", date: "Apr 5",  learn: [], c2: [], c3: ["Pneumonia", "UTIs", "HSV", "STIs", "Sinusitis", "Meningitis", "Fungal Infections", "Tick-Borne Infections", "Pharyngitis & Bronchitis", "ID Drug Charts", "Acute Otitis Media"], notes: "Pre-Mock 1 — Full ID C3 sweep" },
-    ]
-  },
-  {
-    week: 6, title: "Pre-Mock 1 Consolidation", dates: "Apr 6 – Apr 10",
-    startDate: "2026-04-06",
-    days: [
-      { label: "Mon", date: "Apr 6",  learn: [], c2: [], c3: ["Hypertension", "Dyslipidemia", "ACS & Stable Angina", "Atrial Fibrillation", "Heart Failure", "DVT & PE", "Stroke & TIA", "Warfarin Dosing", "CVD Drug Charts"], notes: "Full Cardio C3 sweep — focus: mechanism + contraindications" },
-      { label: "Tue", date: "Apr 7",  learn: [], c2: [], c3: ["AKI", "CKD", "Glaucoma", "Atopic Dermatitis", "Acne", "Rosacea", "Lice & Scabies", "Diabetes", "Diabetes Drug Chart"], notes: "Renal + Eye + Derm + Endo sweep. Flag weak areas for Wed." },
-      { label: "Wed", date: "Apr 8",  learn: [], c2: [], c3: ["Federal Law", "Ethics", "Canadian Healthcare System", "Pharmacy Management 1", "Safety & Documentation", "DEI", "Emergency Preparedness", "EBM & Study Design", "Patient Assessment"], notes: "Law + Admin sweep + remediation on flagged topics from Tue" },
-      { label: "Thu", date: "Apr 9",  learn: [], c2: [], c3: ["Asthma", "COPD", "Smoking Cessation", "Allergic Rhinitis", "Asthma & COPD Drug Charts", "Depression", "Anxiety", "Schizophrenia", "Dementia", "Mental Health Drug Charts"], notes: "Resp + Psych rapid refresh (work day)" },
-      { label: "Fri", date: "Apr 10", learn: [], c2: [], c3: ["GERD/Dyspepsia/PUD", "Constipation", "Diarrhea", "Nausea & Vomiting", "Contraception", "Menopause", "Osteoporosis", "Rheumatoid Arthritis", "Osteoarthritis", "Parkinson's Disease", "Headache & Migraine", "Seizures", "Opioid & Alcohol Use Disorder"], notes: "GI/GU + MSK/Neuro rapid refresh. Rest after 8pm." },
-      { special: "mock", text: "🎯 MOCK EXAM 1 — Saturday April 11" },
-    ]
-  },
-  {
-    week: 7, title: "Post-Mock 1 Remediation", dates: "Apr 12 – Apr 14",
-    startDate: "2026-04-12",
-    days: [
-      { label: "Sun", date: "Apr 12", learn: [], c2: [], c3: [], notes: "Error analysis: categorize every wrong answer by topic + failure type (knowledge gap | misread stem | distractor | calc error). Build ranked weak topic list." },
-      { label: "Mon", date: "Apr 13", learn: [], c2: [], c3: [], notes: "Deep dive: top 3–4 weakest topics. C2-level active recall on those topics only." },
-      { label: "Tue", date: "Apr 14", learn: [], c2: [], c3: [], notes: "PharmAchieve practice vignettes on weak topics. No new material." },
-    ]
-  },
-  {
-    week: 8, title: "Pre-Mock 2 Sweep", dates: "Apr 15 – Apr 24",
-    startDate: "2026-04-15",
-    days: [
-      { label: "Wed", date: "Apr 15", learn: [], c2: [], c3: ["GERD/Dyspepsia/PUD", "Constipation", "Diarrhea", "Nausea & Vomiting", "Pancreatitis", "Contraception", "Menopause", "Erectile Dysfunction"], notes: "GI + GU C3 sweep" },
-      { label: "Thu", date: "Apr 16", learn: [], c2: [], c3: ["Oncology", "CINV", "Common Anemias", "Electrolyte Disorders", "HIV & Opportunistic Infections (incl. PEP/PrEP)", "Sepsis & Septic Shock", "Transgender Health", "Travel Medicine"] },
-      { label: "Fri", date: "Apr 17", learn: [], c2: [], c3: ["Osteoporosis", "Rheumatoid Arthritis", "Osteoarthritis", "Parkinson's Disease", "Headache & Migraine", "Seizures", "Opioid & Alcohol Use Disorder", "Pain Management Drug Charts"] },
-      { label: "Sat", date: "Apr 18", learn: [], c2: [], c3: ["Depression", "Anxiety", "Schizophrenia", "ADHD", "Dementia", "Mental Health Drug Charts"], notes: "Full Psych C3 sweep + active recall on drug charts" },
-      { label: "Sun", date: "Apr 19", learn: [], c2: [], c3: ["Federal Law", "Ethics", "Canadian Healthcare System", "Pharmacy Management 1", "Safety & Documentation", "DEI", "Emergency Preparedness", "EBM & Study Design", "Patient Assessment"], notes: "Law + Admin full sweep" },
-      { label: "Mon", date: "Apr 20", learn: [], c2: [], c3: ["Hypertension", "Dyslipidemia", "ACS & Stable Angina", "Atrial Fibrillation", "Heart Failure", "DVT & PE", "Stroke & TIA", "Warfarin Dosing", "CVD Drug Charts"], notes: "Full Cardio sweep — focus: drug class comparisons, Warfarin interactions" },
-      { label: "Tue", date: "Apr 21", learn: [], c2: [], c3: ["Pneumonia", "UTIs", "HSV", "STIs", "Sinusitis", "Meningitis", "Fungal Infections", "Tick-Borne Infections", "Pharyngitis & Bronchitis", "ID Drug Charts", "Acute Otitis Media", "Influenza"], notes: "Full ID sweep — focus: antibiotic class comparisons, resistance patterns" },
-      { label: "Wed", date: "Apr 22", learn: [], c2: [], c3: ["Asthma", "COPD", "Smoking Cessation", "Allergic Rhinitis", "Asthma & COPD Drug Charts", "Diabetes", "Diabetes Drug Chart", "AKI", "CKD", "Glaucoma"], notes: "📋 PharmAchieve Quiz: GI + GU + MSK + Neuro + Psych this weekend" },
-      { label: "Thu", date: "Apr 23", learn: [], c2: [], c3: ["Drug Interactions", "Pharmacy Calculations 1", "Pharmacy Calculations 2"], notes: "Targeted vignette practice on weak areas from Mock 1" },
-      { label: "Fri", date: "Apr 24", learn: [], c2: [], c3: [], notes: "Rapid refresh on anything still shaky. Rest after 8pm." },
-      { special: "mock", text: "🎯 MOCK EXAM 2 — Saturday April 25" },
-    ]
-  },
-  {
-    week: 9, title: "Final Push", dates: "Apr 26 – Apr 30",
-    startDate: "2026-04-26",
-    days: [
-      { label: "Sun", date: "Apr 26", learn: [], c2: [], c3: [], notes: "Error analysis: same system as Mock 1. Cross-reference with Mock 1 errors — flag recurring pattern topics." },
-      { label: "Mon", date: "Apr 27", learn: [], c2: [], c3: [], notes: "Deep dive remediation: Mock 2 weak areas + any Mock 1/2 overlap topics." },
-      { label: "Tue", date: "Apr 28", learn: [], c2: [], c3: ["CVD Drug Charts", "ID Drug Charts", "Diabetes Drug Chart", "Asthma & COPD Drug Charts", "Mental Health Drug Charts", "Pain Management Drug Charts"], notes: "All drug comparison charts — rapid fire clinical pearls only, no re-reading notes." },
-      { label: "Wed", date: "Apr 29", learn: [], c2: [], c3: [], notes: "C3 sweep: targeted weak areas from both mocks. Practice vignettes on those topics." },
-      { label: "Thu", date: "Apr 30", learn: [], c2: [], c3: [], notes: "Light morning rapid refresh only. No new material. Done ✅" },
-    ]
-  },
-];
+const YIELD_LABELS = { "high": "High", "low-med": "Low-Med", "low": "Low" };
 
-// ─── STATE ───────────────────────────────────────────────────────────────────
-// State is loaded from Firestore via the module script above.
-// This variable will be populated before render runs.
-let state = {};
-
-function saveState(stateObj) {
-  // Save to Firestore (async, non-blocking). Falls back to localStorage on error.
-  if (window._saveToFirestore) {
-    window._saveToFirestore(stateObj);
-  } else {
-    try { localStorage.setItem('pebc_tracker_v2', JSON.stringify(stateObj)); } catch(e) {}
-  }
-  // Flash autosave indicator
-  const ind = document.getElementById('autosaveIndicator');
-  if (ind) {
-    ind.classList.add('visible');
-    clearTimeout(window._saveIndicatorTimer);
-    window._saveIndicatorTimer = setTimeout(() => ind.classList.remove('visible'), 1500);
-  }
+function yieldTag(topic) {
+  const y = TOPIC_YIELD[topic];
+  if (!y) return '';
+  return `<span class="yield-tag ${y}">${YIELD_LABELS[y]}</span>`;
 }
 
-// ─── RENDER ──────────────────────────────────────────────────────────────────
-
-function getAllTopics() {
-  const topics = new Set();
-  for (const week of scheduleData) {
-    for (const day of week.days) {
-      if (!day.special) {
-        (day.learn || []).forEach(t => topics.add(t));
-        (day.c2 || []).forEach(t => topics.add(t));
-        (day.c3 || []).forEach(t => topics.add(t));
-      }
-    }
-  }
-  // Add pre-completed
-  topics.add('Orientation');
-  topics.add('Exam Overview & Study Strategies');
-  topics.add('Principles of Infection & Antimicrobial Therapy');
-  return topics;
-}
-
-function updateStats() {
-  const all = getAllTopics();
-  const total = TOTAL;
-  let c1=0, c2=0, c3=0, full=0;
-  all.forEach(t => {
-    if (state[t+'|c1']) c1++;
-    if (state[t+'|c2']) c2++;
-    if (state[t+'|c3']) c3++;
-    if (state[t+'|c1'] && state[t+'|c2'] && state[t+'|c3']) full++;
+const ALL_TOPICS = [];
+const TOPIC_TO_SYSTEM = {};
+Object.entries(SYSTEMS).forEach(([sys, topics]) => {
+  topics.forEach(t => {
+    ALL_TOPICS.push(t);
+    TOPIC_TO_SYSTEM[t] = sys;
   });
-  document.getElementById('c1stat').innerHTML = `${c1} <span>/ ${total}</span>`;
-  document.getElementById('c2stat').innerHTML = `${c2} <span>/ ${total}</span>`;
-  document.getElementById('c3stat').innerHTML = `${c3} <span>/ ${total}</span>`;
-  document.getElementById('fullstat').innerHTML = `${full} <span>/ ${total}</span>`;
-
-  const c1pct = (c1/total)*100;
-  const c2pct = (c2/total)*100;
-  const c3pct = (c3/total)*100;
-  document.getElementById('bar1').style.width = c1pct+'%';
-  document.getElementById('bar2').style.width = c2pct+'%';
-  document.getElementById('bar3').style.width = c3pct+'%';
-  document.getElementById('pctLabel').textContent = Math.round(c1pct)+'% C1 · '+Math.round(c2pct)+'% C2 · '+Math.round(c3pct)+'% C3';
-
-  // Days left
-  const today = new Date();
-  const diff = Math.ceil((EXAM_DATE - today) / 86400000);
-  document.getElementById('daysLeft').textContent = diff > 0 ? diff : '🎉';
-
-  // On track
-  const daysSinceStart = Math.max(1, Math.ceil((today - new Date('2026-03-03')) / 86400000));
-  const expectedC1 = Math.min(total, Math.round(daysSinceStart * 4));
-  const onTrackEl = document.getElementById('ontrack');
-  if (c1 >= expectedC1) {
-    onTrackEl.textContent = '✓ YES';
-    onTrackEl.style.color = 'var(--c1)';
-    onTrackEl.style.fontSize = '18px';
-  } else {
-    onTrackEl.textContent = `↓ ${expectedC1-c1} behind`;
-    onTrackEl.style.color = 'var(--coral)';
-    onTrackEl.style.fontSize = '14px';
-  }
-  updateProgressRing(c1, total);
-}
-
-function weekCompletionPct(week) {
-  const topics = [];
-  for (const day of week.days) {
-    if (!day.special) {
-      (day.learn || []).forEach(t => topics.push(t));
-    }
-  }
-  if (topics.length === 0) return 100;
-  const done = topics.filter(t => state[t+'|c1'] && state[t+'|c2'] && state[t+'|c3']).length;
-  return Math.round((done / topics.length) * 100);
-}
-
-function renderTopicList(topics, cycle, cssClass, weekNum) {
-  if (!topics || topics.length === 0) return '<span style="font-size:11px;color:var(--border)">—</span>';
-  return '<div class="topic-list">' +
-    topics.map(t => topicRow(t, cycle, cssClass, weekNum)).join('') +
-    '</div>';
-}
-
-function topicRow(topic, cycle, cssClass, weekNum) {
-  const key = topic+'|'+cycle;
-  const checked = state[key];
-  const allDone = state[topic+'|c1'] && state[topic+'|c2'] && state[topic+'|c3'];
-  return `
-    <div class="topic-item ${allDone ? 'all-done' : ''}"
-         data-topic="${topic.replace(/"/g,'&quot;')}"
-         data-cycle="${cycle}"
-         data-week="${weekNum}"
-         draggable="true"
-         ondragstart="onDragStart(event)">
-      <div class="cycle-check ${cssClass} ${checked ? 'checked' : ''}"
-           onclick="event.stopPropagation();toggleTopic('${topic.replace(/'/g,"\\'")}','${cycle}',this)">
-        ${checked ? '&#10003;' : ''}
-      </div>
-      <span class="topic-name">${topic}</span>
-    </div>`;
-}
-
-function renderSchedule() {
-  const container = document.getElementById('schedule');
-  let html = '';
-  for (const week of scheduleData) {
-    const pct = weekCompletionPct(week);
-    const isCurrent = isCurrentWeekFn(week);
-    html += `
-    <div class="week-block" id="week-block-${week.week}" data-week="${week.week}" data-start="${week.startDate}">
-      <div class="week-header" onclick="toggleWeek(this)">
-        <div class="week-num">W${week.week}</div>
-        <div class="week-title">${week.title}</div>
-        <div class="week-dates">${week.dates}</div>
-        ${isCurrent ? '<div class="current-badge">Current</div>' : ''}
-        <div class="week-mini-bar"><div class="week-mini-fill" style="width:${pct}%"></div></div>
-        <div class="week-pct">${pct}%</div>
-        <div class="chevron">&#9660;</div>
-      </div>
-      <div class="week-body">
-        <div class="col-header">
-          <div></div>
-          <div>C1 — Learn</div>
-          <div>C2 — Review</div>
-          <div>C3 — Rapid Refresh</div>
-          <div>Notes</div>
-        </div>`;
-
-    for (const day of week.days) {
-      if (day.special) {
-        const tag = day.special;
-        html += `<div class="special-row">
-          <div class="special-tag ${tag}">${tag === 'quiz' ? 'Quiz' : tag === 'mock' ? 'Mock Exam' : 'Rest'}</div>
-          <div class="special-text">${day.text}</div>
-        </div>`;
-      } else {
-        const safeDate = (day.date || '').replace(/'/g, "\\'");
-        html += `<div class="day-row"
-            ondragover="onDragOver(event)"
-            ondragleave="onDragLeave(event)"
-            ondrop="onDrop(event, ${week.week}, '${safeDate}')">
-          <div class="day-cell">
-            <div class="day-label">${day.label}</div>
-            <div class="day-date">${day.date}</div>
-          </div>
-          <div class="day-cell">${renderTopicList(day.learn, 'c1', 'c1', week.week)}</div>
-          <div class="day-cell">${renderTopicList(day.c2,    'c2', 'c2', week.week)}</div>
-          <div class="day-cell">${renderTopicList(day.c3,    'c3', 'c3', week.week)}</div>
-          <div class="day-cell notes-cell">${day.notes || ''}</div>
-        </div>`;
-      }
-    }
-
-    html += `</div></div>`;
-  }
-  container.innerHTML = html;
-}
-
-function isCurrentWeekFn(week) {
-  const today = new Date();
-  const start = new Date(week.startDate);
-  const end = new Date(start);
-  end.setDate(end.getDate() + 7);
-  return today >= start && today < end;
-}
-
-// ─── INTERACTIONS ─────────────────────────────────────────────────────────────
-
-function toggleTopic(topic, cycle, el) {
-  const key = topic+'|'+cycle;
-  state[key] = !state[key];
-  saveState(state);
-  el.classList.toggle('checked', state[key]);
-  el.textContent = state[key] ? '✓' : '';
-  // Update parent all-done
-  const allDone = state[topic+'|c1'] && state[topic+'|c2'] && state[topic+'|c3'];
-  el.closest('.topic-item').classList.toggle('all-done', allDone);
-  updateStats();
-  // Update week bar
-  const weekBlock = el.closest('.week-block');
-  if (weekBlock) {
-    const weekNum = parseInt(weekBlock.dataset.week);
-    const week = scheduleData.find(w => w.week === weekNum);
-    if (week) {
-      const pct = weekCompletionPct(week);
-      weekBlock.querySelector('.week-mini-fill').style.width = pct+'%';
-      weekBlock.querySelector('.week-pct').textContent = pct+'%';
-    }
-  }
-  refreshCalendar();
-}
-
-function toggleWeek(header) {
-  header.closest('.week-block').classList.toggle('collapsed');
-}
-
-function filterWeeks(mode, btn) {
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-
-  document.querySelectorAll('.week-block').forEach(block => {
-    const startDate = new Date(block.dataset.start);
-    const today = new Date();
-    const endDate = new Date(startDate);
-    endDate.setDate(endDate.getDate() + 7);
-
-    if (mode === 'all') {
-      block.classList.remove('filtered-out');
-    } else if (mode === 'current') {
-      block.classList.toggle('filtered-out', !(today >= startDate && today < endDate));
-    } else if (mode === 'incomplete') {
-      const weekNum = parseInt(block.dataset.week);
-      const week = scheduleData.find(w => w.week === weekNum);
-      const pct = week ? weekCompletionPct(week) : 100;
-      block.classList.toggle('filtered-out', pct === 100);
-    }
-  });
-}
-
-// ─── EXPORT ───────────────────────────────────────────────────────────────────
-
-function openExport() {
-  let md = `# PEBC MCQ 2026 — Study Schedule Export\n`;
-  md += `_Exported: ${new Date().toLocaleDateString()}_\n\n`;
-
-  for (const week of scheduleData) {
-    md += `## Week ${week.week}: ${week.title} (${week.dates})\n\n`;
-    for (const day of week.days) {
-      if (day.special) {
-        md += `> **${day.special.toUpperCase()}:** ${day.text}\n\n`;
-      } else {
-        md += `### ${day.label} ${day.date}\n`;
-        if ((day.learn||[]).length > 0) {
-          md += `**C1 — Learn:**\n`;
-          (day.learn||[]).forEach(t => {
-            const done = state[t+'|c1'] ? '✅' : '⬜';
-            md += `- ${done} ${t}\n`;
-          });
-        }
-        if ((day.c2||[]).length > 0) {
-          md += `**C2 — Review:**\n`;
-          (day.c2||[]).forEach(t => {
-            const done = state[t+'|c2'] ? '✅' : '⬜';
-            md += `- ${done} ${t}\n`;
-          });
-        }
-        if ((day.c3||[]).length > 0) {
-          md += `**C3 — Rapid Refresh:**\n`;
-          (day.c3||[]).forEach(t => {
-            const done = state[t+'|c3'] ? '✅' : '⬜';
-            md += `- ${done} ${t}\n`;
-          });
-        }
-        if (day.notes) md += `_${day.notes}_\n`;
-        md += '\n';
-      }
-    }
-  }
-  document.getElementById('exportText').value = md;
-  document.getElementById('exportModal').classList.add('open');
-}
-
-function closeExport() {
-  document.getElementById('exportModal').classList.remove('open');
-}
-
-function copyExport() {
-  const ta = document.getElementById('exportText');
-  ta.select();
-  document.execCommand('copy');
-  const btn = event.target;
-  btn.textContent = 'Copied!';
-  setTimeout(() => btn.textContent = 'Copy to Clipboard', 1500);
-}
-
-// Close modal on overlay click
-document.getElementById('exportModal').addEventListener('click', function(e) {
-  if (e.target === this) closeExport();
 });
 
-// ─── SIDEBAR ─────────────────────────────────────────────────────────────────
+const TOTAL = ALL_TOPICS.length;
+const EXAM_DATE = '2026-05-19';
+const C2_OFFSET = 3;
+const C3_OFFSET = 10; // C1 + 10 = C2 + 7
 
-function renderSidebarWeeks() {
-  const container = document.getElementById('sidebarWeeks');
-  const today = new Date();
-  let html = '';
-  for (const week of scheduleData) {
-    const start = new Date(week.startDate);
-    const end = new Date(start);
-    end.setDate(end.getDate() + 7);
-    const isCurrent = today >= start && today < end;
-    html += `<div class="sidebar-week-item ${isCurrent ? 'current-week' : ''}"
-        onclick="jumpToWeek(${week.week})">
-      <div class="sidebar-week-num">W${week.week}</div>
-      <div class="sidebar-week-label">${week.title}</div>
-      <div class="sidebar-week-dot"></div>
-    </div>`;
+// ===== STATE =====
+let state = {};
+let collapsedCards = {};
+let collapsedSystems = {};
+let sortCol = 'topic';
+let sortDir = 'asc';
+
+// ===== UTILITIES =====
+function todayStr() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function addDays(dateStr, days) {
+  const d = new Date(dateStr + 'T12:00:00');
+  d.setDate(d.getDate() + days);
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr + 'T12:00:00');
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return months[d.getMonth()] + ' ' + d.getDate();
+}
+
+function daysUntilExam() {
+  const today = new Date(todayStr() + 'T12:00:00');
+  const exam = new Date(EXAM_DATE + 'T12:00:00');
+  return Math.ceil((exam - today) / 86400000);
+}
+
+function daysBetween(a, b) {
+  return Math.ceil((new Date(b+'T12:00:00') - new Date(a+'T12:00:00')) / 86400000);
+}
+
+// ===== STATE HELPERS =====
+function getC1(t) { return state[t + '|c1'] || null; }
+function getC2Done(t) { return state[t + '|c2'] || null; }
+function getC3Done(t) { return state[t + '|c3'] || null; }
+function getC2Due(t) { const c1 = getC1(t); return c1 ? addDays(c1, C2_OFFSET) : null; }
+function getC3Due(t) { const c1 = getC1(t); return c1 ? addDays(c1, C3_OFFSET) : null; }
+
+// ===== MIGRATION =====
+window._migrateState = function(parsed) {
+  const keys = Object.keys(parsed);
+  if (keys.length === 0) return parsed;
+  // Check if any value is boolean (old format)
+  const hasBooleans = keys.some(k => typeof parsed[k] === 'boolean');
+  if (!hasBooleans) return parsed;
+
+  console.log('Migrating from boolean to date format...');
+  const migrated = {};
+  const today = todayStr();
+  keys.forEach(k => {
+    if (parsed[k] === true) {
+      migrated[k] = today;
+    }
+  });
+  return migrated;
+};
+
+// ===== ACTIONS =====
+function logC1(topic, date) {
+  state[topic + '|c1'] = date || todayStr();
+  save();
+  renderAll();
+}
+
+function markC2Done(topic, date) {
+  state[topic + '|c2'] = date || todayStr();
+  save();
+  renderAll();
+}
+
+function markC3Done(topic, date) {
+  state[topic + '|c3'] = date || todayStr();
+  save();
+  renderAll();
+}
+
+// Date picker helpers
+function showDatePicker(topic, cycle) {
+  // Hide any other open pickers
+  document.querySelectorAll('.date-pick-wrap.open').forEach(el => el.classList.remove('open'));
+  const id = 'dp-' + cycle + '-' + topic.replace(/[^a-zA-Z0-9]/g, '_');
+  const el = document.getElementById(id);
+  if (el) {
+    el.classList.add('open');
+    const input = el.querySelector('.date-pick-input');
+    if (input) { input.value = todayStr(); input.focus(); }
   }
+}
+
+function confirmDatePick(topic, cycle) {
+  const id = 'dp-' + cycle + '-' + topic.replace(/[^a-zA-Z0-9]/g, '_');
+  const el = document.getElementById(id);
+  if (!el) return;
+  const input = el.querySelector('.date-pick-input');
+  const date = input ? input.value : '';
+  if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
+  if (cycle === 'c1') logC1(topic, date);
+  else if (cycle === 'c2') markC2Done(topic, date);
+  else if (cycle === 'c3') markC3Done(topic, date);
+}
+
+function cancelDatePick(topic, cycle) {
+  const id = 'dp-' + cycle + '-' + topic.replace(/[^a-zA-Z0-9]/g, '_');
+  const el = document.getElementById(id);
+  if (el) el.classList.remove('open');
+}
+
+function undoTopic(topic) {
+  delete state[topic + '|c1'];
+  delete state[topic + '|c2'];
+  delete state[topic + '|c3'];
+  save();
+  renderAll();
+}
+
+function save() {
+  if (window._saveToFirestore) {
+    window._saveToFirestore(state);
+  } else {
+    try { localStorage.setItem('pebc_tracker_v3', JSON.stringify(state)); } catch(_) {}
+  }
+  const ind = document.getElementById('saveIndicator');
+  if (ind) {
+    ind.classList.add('visible');
+    clearTimeout(window._saveTimer);
+    window._saveTimer = setTimeout(() => ind.classList.remove('visible'), 1200);
+  }
+}
+
+// ===== COMPUTATIONS =====
+function getPaceStats() {
+  const today = todayStr();
+  const d3ago = addDays(today, -3);
+  const d7ago = addDays(today, -7);
+  let c1Last3 = 0, c1Last7 = 0, totalC1 = 0;
+
+  ALL_TOPICS.forEach(t => {
+    const c1 = getC1(t);
+    if (c1) {
+      totalC1++;
+      if (c1 >= d3ago) c1Last3++;
+      if (c1 >= d7ago) c1Last7++;
+    }
+  });
+
+  const avgPerDay = c1Last7 / 7;
+  const remaining = TOTAL - totalC1;
+  let estDate = null;
+  if (avgPerDay > 0 && remaining > 0) {
+    estDate = addDays(today, Math.ceil(remaining / avgPerDay));
+  } else if (remaining === 0) {
+    estDate = 'Done!';
+  }
+
+  return { c1Last3, c1Last7, avgPerDay: avgPerDay.toFixed(1), estDate, remaining, totalC1 };
+}
+
+function getDueToday() {
+  const today = todayStr();
+  const items = [];
+  ALL_TOPICS.forEach(t => {
+    const c2Due = getC2Due(t);
+    if (c2Due && !getC2Done(t) && c2Due <= today) {
+      items.push({ topic: t, cycle: 'c2', due: c2Due, overdue: c2Due < today });
+    }
+    const c3Due = getC3Due(t);
+    if (c3Due && !getC3Done(t) && getC2Done(t) && c3Due <= today) {
+      items.push({ topic: t, cycle: 'c3', due: c3Due, overdue: c3Due < today });
+    }
+    // Also show c3 due if c2 not done yet but c3 is overdue (edge case)
+    if (c3Due && !getC3Done(t) && !getC2Done(t) && c3Due <= today) {
+      // c2 not done, so c3 is also pending — don't show c3 until c2 done
+    }
+  });
+  items.sort((a, b) => (b.overdue - a.overdue) || a.due.localeCompare(b.due));
+  return items;
+}
+
+function getUpcoming(days) {
+  const today = todayStr();
+  const horizon = addDays(today, days);
+  const items = [];
+  ALL_TOPICS.forEach(t => {
+    const c2Due = getC2Due(t);
+    if (c2Due && !getC2Done(t) && c2Due > today && c2Due <= horizon) {
+      items.push({ topic: t, cycle: 'c2', due: c2Due });
+    }
+    const c3Due = getC3Due(t);
+    if (c3Due && !getC3Done(t) && getC2Done(t) && c3Due > today && c3Due <= horizon) {
+      items.push({ topic: t, cycle: 'c3', due: c3Due });
+    }
+  });
+  items.sort((a, b) => a.due.localeCompare(b.due));
+  return items;
+}
+
+function getProgress() {
+  let c1 = 0, c2 = 0, c3 = 0;
+  ALL_TOPICS.forEach(t => {
+    if (getC1(t)) c1++;
+    if (getC2Done(t)) c2++;
+    if (getC3Done(t)) c3++;
+  });
+  return {
+    c1: { done: c1, pct: Math.round(c1 / TOTAL * 100) },
+    c2: { done: c2, pct: Math.round(c2 / TOTAL * 100) },
+    c3: { done: c3, pct: Math.round(c3 / TOTAL * 100) }
+  };
+}
+
+// ===== RENDERING =====
+function renderAll() {
+  renderDashboard();
+  renderLogTopics();
+  renderAllTopicsTable();
+  renderSidebar();
+}
+
+function renderDashboard() {
+  // Countdown
+  const days = daysUntilExam();
+  document.getElementById('countdownBar').innerHTML = `
+    <div class="countdown-chip">
+      <div class="countdown-num">${days > 0 ? days : '0'}</div>
+      <div class="countdown-label">days left</div>
+    </div>
+    <div class="countdown-exam">Exam: May 19, 2026</div>
+  `;
+
+  // Pace card
+  const pace = getPaceStats();
+  renderCard('cardPace', 'Pace Tracking', `
+    <div class="stat-grid">
+      <div class="stat-box">
+        <div class="stat-label">C1 Last 3 Days</div>
+        <div class="stat-val blue">${pace.c1Last3}</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">C1 Last 7 Days</div>
+        <div class="stat-val blue">${pace.c1Last7}</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Avg C1/Day (7d)</div>
+        <div class="stat-val">${pace.avgPerDay}</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Remaining</div>
+        <div class="stat-val ${pace.remaining === 0 ? 'green' : ''}">${pace.remaining}</div>
+        <div class="stat-sub">of ${TOTAL} topics</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Est. Completion</div>
+        <div class="stat-val ${pace.estDate === 'Done!' ? 'green' : ''}" style="font-size:16px">${pace.estDate ? (pace.estDate === 'Done!' ? 'Done!' : formatDate(pace.estDate)) : '—'}</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Total C1 Done</div>
+        <div class="stat-val green">${pace.totalC1}</div>
+      </div>
+    </div>
+  `);
+
+  // Due Today
+  const dueItems = getDueToday();
+  let dueHTML = '';
+  if (dueItems.length === 0) {
+    dueHTML = '<div class="empty-msg">Nothing due today. Nice work!</div>';
+  } else {
+    dueHTML = '<ul class="due-list">' + dueItems.map(item => {
+      const escapedTopic = item.topic.replace(/'/g, "\\'");
+      const fn = item.cycle === 'c2' ? `markC2Done('${escapedTopic}')` : `markC3Done('${escapedTopic}')`;
+      return `<li class="due-item ${item.overdue ? 'overdue' : ''}">
+        <span class="due-badge badge-${item.cycle}">${item.cycle.toUpperCase()}</span>
+        ${item.overdue ? '<span class="due-badge badge-overdue">Overdue</span>' : ''}
+        <span class="due-topic">${item.topic}</span>
+        <span class="due-date">${item.overdue ? 'Due ' + formatDate(item.due) : 'Today'}</span>
+        <button class="due-mark-btn" onclick="${fn}">Done</button>
+      </li>`;
+    }).join('') + '</ul>';
+  }
+  renderCard('cardDueToday', 'Due Today' + (dueItems.length > 0 ? ` <span class="card-count">${dueItems.length}</span>` : ''), dueHTML);
+
+  // Upcoming
+  const upcoming = getUpcoming(3);
+  let upHTML = '';
+  if (upcoming.length === 0) {
+    upHTML = '<div class="empty-msg">No reviews coming up in the next 3 days.</div>';
+  } else {
+    upHTML = '<ul class="due-list">' + upcoming.map(item => `
+      <li class="due-item">
+        <span class="due-badge badge-${item.cycle}">${item.cycle.toUpperCase()}</span>
+        <span class="due-topic">${item.topic}</span>
+        <span class="due-date">${formatDate(item.due)}</span>
+      </li>
+    `).join('') + '</ul>';
+  }
+  renderCard('cardUpcoming', 'Upcoming (3 Days)', upHTML);
+
+  // Progress
+  const prog = getProgress();
+  renderCard('cardProgress', 'Progress', `
+    <div class="progress-row">
+      <div class="progress-info"><span class="label">C1 — Learn</span><span class="pct">${prog.c1.done}/${TOTAL} (${prog.c1.pct}%)</span></div>
+      <div class="progress-track"><div class="progress-fill blue" style="width:${prog.c1.pct}%"></div></div>
+    </div>
+    <div class="progress-row">
+      <div class="progress-info"><span class="label">C2 — Review</span><span class="pct">${prog.c2.done}/${TOTAL} (${prog.c2.pct}%)</span></div>
+      <div class="progress-track"><div class="progress-fill orange" style="width:${prog.c2.pct}%"></div></div>
+    </div>
+    <div class="progress-row">
+      <div class="progress-info"><span class="label">C3 — Rapid Refresh</span><span class="pct">${prog.c3.done}/${TOTAL} (${prog.c3.pct}%)</span></div>
+      <div class="progress-track"><div class="progress-fill green" style="width:${prog.c3.pct}%"></div></div>
+    </div>
+  `);
+}
+
+function renderCard(id, titleHTML, bodyHTML) {
+  const el = document.getElementById(id);
+  const collapsed = collapsedCards[id] || false;
+  el.innerHTML = `
+    <div class="card ${collapsed ? 'collapsed' : ''}">
+      <div class="card-header" onclick="toggleCard('${id}')">
+        <div class="card-title">${titleHTML}</div>
+        <span class="card-chevron">&#9660;</span>
+      </div>
+      <div class="card-body">${bodyHTML}</div>
+    </div>
+  `;
+}
+
+function toggleCard(id) {
+  collapsedCards[id] = !collapsedCards[id];
+  renderDashboard();
+}
+
+// ===== LOG TOPICS VIEW =====
+function renderLogTopics() {
+  const container = document.getElementById('logContainer');
+  const today = todayStr();
+  let html = '';
+
+  Object.entries(SYSTEMS).forEach(([sys, topics]) => {
+    const c1Count = topics.filter(t => getC1(t)).length;
+    const collapsed = collapsedSystems[sys] === true;
+
+    html += `<div class="log-system ${collapsed ? 'collapsed' : ''}" data-system="${sys}">
+      <div class="log-system-header" onclick="toggleLogSystem('${sys.replace(/'/g, "\\'")}')">
+        <div class="log-system-name">${sys}</div>
+        <div class="log-system-progress">${c1Count}/${topics.length} C1</div>
+        <span class="log-system-chevron">&#9660;</span>
+      </div>
+      <div class="log-system-body">`;
+
+    topics.forEach(t => {
+      const c1 = getC1(t);
+      const c2Due = getC2Due(t);
+      const c2Done = getC2Done(t);
+      const c3Due = getC3Due(t);
+      const c3Done = getC3Done(t);
+      const escapedT = t.replace(/'/g, "\\'");
+
+      let statusHTML = '';
+
+      const dpId = (cycle, tp) => 'dp-' + cycle + '-' + tp.replace(/[^a-zA-Z0-9]/g, '_');
+      const dpHTML = (cycle, tp) => {
+        const esc = tp.replace(/'/g, "\\'");
+        return `<div class="date-pick-wrap" id="${dpId(cycle, tp)}">
+          <input type="date" class="date-pick-input" value="${todayStr()}" max="${todayStr()}">
+          <button class="date-pick-confirm" onclick="event.stopPropagation();confirmDatePick('${esc}','${cycle}')">Save</button>
+          <button class="date-pick-cancel" onclick="event.stopPropagation();cancelDatePick('${esc}','${cycle}')">&#10005;</button>
+        </div>`;
+      };
+
+      if (!c1) {
+        // Not started — split button: "Log C1" (today) + calendar icon (pick date)
+        statusHTML = `<div class="date-pick-group">
+          <button class="log-c1-btn" onclick="event.stopPropagation();logC1('${escapedT}')">Log C1</button>
+          <button class="date-pick-toggle" onclick="event.stopPropagation();showDatePicker('${escapedT}','c1')" title="Log with past date">&#128197;</button>
+        </div>`;
+        statusHTML += dpHTML('c1', t);
+      } else {
+        // C1 done
+        statusHTML += `<span class="cycle-pill done">C1 ${formatDate(c1)}</span>`;
+
+        // C2 status
+        if (c2Done) {
+          statusHTML += `<span class="cycle-pill done">C2 ${formatDate(c2Done)}</span>`;
+        } else if (c2Due && c2Due <= today) {
+          const isOverdue = c2Due < today;
+          statusHTML += `<span class="cycle-pill ${isOverdue ? 'overdue' : 'due'}">C2 ${isOverdue ? 'Overdue' : 'Due'}</span>`;
+          statusHTML += `<button class="log-done-btn" onclick="event.stopPropagation();markC2Done('${escapedT}')">Done</button>`;
+          statusHTML += `<button class="date-pick-toggle" style="border-radius:4px;padding:3px 6px;font-size:10px" onclick="event.stopPropagation();showDatePicker('${escapedT}','c2')" title="Log with past date">&#128197;</button>`;
+          statusHTML += dpHTML('c2', t);
+        } else if (c2Due) {
+          statusHTML += `<span class="cycle-pill pending">C2 ${formatDate(c2Due)}</span>`;
+        }
+
+        // C3 status
+        if (c3Done) {
+          statusHTML += `<span class="cycle-pill done">C3 ${formatDate(c3Done)}</span>`;
+        } else if (c2Done && c3Due && c3Due <= today) {
+          const isOverdue = c3Due < today;
+          statusHTML += `<span class="cycle-pill ${isOverdue ? 'overdue' : 'due'}">C3 ${isOverdue ? 'Overdue' : 'Due'}</span>`;
+          statusHTML += `<button class="log-done-btn" onclick="event.stopPropagation();markC3Done('${escapedT}')">Done</button>`;
+          statusHTML += `<button class="date-pick-toggle" style="border-radius:4px;padding:3px 6px;font-size:10px" onclick="event.stopPropagation();showDatePicker('${escapedT}','c3')" title="Log with past date">&#128197;</button>`;
+          statusHTML += dpHTML('c3', t);
+        } else if (c2Done && c3Due) {
+          statusHTML += `<span class="cycle-pill pending">C3 ${formatDate(c3Due)}</span>`;
+        } else if (!c2Done) {
+          statusHTML += `<span class="cycle-pill not-started">C3 —</span>`;
+        }
+
+        statusHTML += ` <button class="log-undo-btn" onclick="event.stopPropagation();undoTopic('${escapedT}')" title="Reset topic">&#8634;</button>`;
+      }
+
+      html += `<div class="log-topic-row" data-topic="${t.toLowerCase()}">
+        <div class="log-topic-name">${t}${yieldTag(t)}</div>
+        <div class="log-cycle-status">${statusHTML}</div>
+      </div>`;
+    });
+
+    html += `</div></div>`;
+  });
+
   container.innerHTML = html;
 }
 
-function jumpToWeek(weekNum) {
-  switchTab('table');
-  setTimeout(() => {
-    const el = document.getElementById('week-block-' + weekNum);
-    if (el) {
-      if (el.classList.contains('collapsed')) el.classList.remove('collapsed');
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-    document.querySelectorAll('.sidebar-week-item').forEach((item, i) => {
-      item.classList.toggle('active-week', scheduleData[i] && scheduleData[i].week === weekNum);
+function toggleLogSystem(sys) {
+  collapsedSystems[sys] = !collapsedSystems[sys];
+  const el = document.querySelector(`.log-system[data-system="${sys}"]`);
+  if (el) el.classList.toggle('collapsed');
+}
+
+function filterLogTopics(query) {
+  query = query.toLowerCase().trim();
+  document.querySelectorAll('.log-topic-row').forEach(row => {
+    const name = row.dataset.topic || '';
+    row.classList.toggle('search-hidden', query && !name.includes(query));
+  });
+  // Show all systems when searching
+  if (query) {
+    document.querySelectorAll('.log-system.collapsed').forEach(s => s.classList.remove('collapsed'));
+  }
+}
+
+// ===== ALL TOPICS TABLE =====
+function renderAllTopicsTable() {
+  const today = todayStr();
+  const tbody = document.getElementById('allTableBody');
+
+  // Populate system filter dropdown
+  const sysSel = document.getElementById('allFilterSystem');
+  if (sysSel.options.length <= 1) {
+    Object.keys(SYSTEMS).forEach(sys => {
+      const opt = document.createElement('option');
+      opt.value = sys;
+      opt.textContent = sys;
+      sysSel.appendChild(opt);
     });
-    const week = scheduleData.find(w => w.week === weekNum);
-    if (week) {
-      document.getElementById('headerWeekTitle').textContent = 'Week ' + weekNum + ' — ' + week.title;
-      document.getElementById('headerWeekDates').textContent = week.dates;
+  }
+
+  // Build sorted topic list
+  let sorted = [...ALL_TOPICS];
+  sorted.sort((a, b) => {
+    let va, vb;
+    switch (sortCol) {
+      case 'topic': va = a; vb = b; break;
+      case 'yield': { const yo = {'high':'0','low-med':'1','low':'2'}; va = yo[TOPIC_YIELD[a]] || '3'; vb = yo[TOPIC_YIELD[b]] || '3'; break; }
+      case 'system': va = TOPIC_TO_SYSTEM[a]; vb = TOPIC_TO_SYSTEM[b]; break;
+      case 'c1': va = getC1(a) || 'z'; vb = getC1(b) || 'z'; break;
+      case 'c2due': va = getC2Due(a) || 'z'; vb = getC2Due(b) || 'z'; break;
+      case 'c2done': va = getC2Done(a) || 'z'; vb = getC2Done(b) || 'z'; break;
+      case 'c3due': va = getC3Due(a) || 'z'; vb = getC3Due(b) || 'z'; break;
+      case 'c3done': va = getC3Done(a) || 'z'; vb = getC3Done(b) || 'z'; break;
+      default: va = a; vb = b;
     }
+    const cmp = String(va).localeCompare(String(vb));
+    return sortDir === 'asc' ? cmp : -cmp;
+  });
+
+  let html = '';
+  sorted.forEach(t => {
+    const c1 = getC1(t);
+    const c2Due = getC2Due(t);
+    const c2Done = getC2Done(t);
+    const c3Due = getC3Due(t);
+    const c3Done = getC3Done(t);
+
+    const c2Class = c2Done ? 'td-done' : (c2Due && c2Due < today ? 'td-overdue' : (c2Due && c2Due === today ? 'td-due' : (c2Due ? 'td-pending' : 'td-na')));
+    const c3Class = c3Done ? 'td-done' : (c3Due && c3Due < today && c2Done ? 'td-overdue' : (c3Due && c3Due === today && c2Done ? 'td-due' : (c3Due ? 'td-pending' : 'td-na')));
+
+    // Status for filtering
+    let status = 'not-started';
+    if (c3Done) status = 'c3-done';
+    else if (c3Due && c3Due <= today && c2Done) status = 'c3-due';
+    else if (c2Done) status = 'c2-done';
+    else if (c2Due && c2Due <= today) status = 'c2-due';
+    else if (c1) status = 'c1-done';
+
+    const yld = TOPIC_YIELD[t] || '';
+    const yldClass = yld === 'high' ? 'td-yield-high' : (yld === 'low-med' ? 'td-yield-lowmed' : (yld === 'low' ? 'td-yield-low' : 'td-na'));
+    const yldLabel = yld ? YIELD_LABELS[yld] : '—';
+
+    html += `<tr data-topic="${t.toLowerCase()}" data-system="${TOPIC_TO_SYSTEM[t]}" data-status="${status}" data-yield="${yld}">
+      <td style="font-weight:700">${t}</td>
+      <td class="${yldClass}">${yldLabel}</td>
+      <td style="color:var(--text-dim)">${TOPIC_TO_SYSTEM[t]}</td>
+      <td class="${c1 ? 'td-done' : 'td-na'}">${c1 ? formatDate(c1) : '—'}</td>
+      <td class="${c2Due ? 'td-pending' : 'td-na'}">${c2Due ? formatDate(c2Due) : '—'}</td>
+      <td class="${c2Class}">${c2Done ? formatDate(c2Done) : (c2Due && c2Due <= today ? (c2Due < today ? 'Overdue' : 'Due') : '—')}</td>
+      <td class="${c3Due ? 'td-pending' : 'td-na'}">${c3Due ? formatDate(c3Due) : '—'}</td>
+      <td class="${c3Class}">${c3Done ? formatDate(c3Done) : (c3Due && c3Due <= today && c2Done ? (c3Due < today ? 'Overdue' : 'Due') : '—')}</td>
+    </tr>`;
+  });
+
+  tbody.innerHTML = html;
+
+  // Update sort arrows
+  document.querySelectorAll('.topics-table th').forEach(th => {
+    const arrow = th.querySelector('.sort-arrow');
+    if (th.dataset.col === sortCol) {
+      arrow.textContent = sortDir === 'asc' ? ' ▲' : ' ▼';
+    } else {
+      arrow.textContent = '';
+    }
+  });
+
+  filterAllTopics();
+}
+
+function sortAllTopics(col) {
+  if (sortCol === col) {
+    sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortCol = col;
+    sortDir = 'asc';
+  }
+  renderAllTopicsTable();
+}
+
+function filterAllTopics() {
+  const query = (document.getElementById('allSearch').value || '').toLowerCase().trim();
+  const sys = document.getElementById('allFilterSystem').value;
+  const yld = document.getElementById('allFilterYield').value;
+  const status = document.getElementById('allFilterStatus').value;
+
+  document.querySelectorAll('#allTableBody tr').forEach(row => {
+    const matchQuery = !query || row.dataset.topic.includes(query);
+    const matchSys = !sys || row.dataset.system === sys;
+    const matchYield = !yld || row.dataset.yield === yld;
+    const matchStatus = !status || row.dataset.status === status;
+    row.classList.toggle('table-hidden', !(matchQuery && matchSys && matchYield && matchStatus));
+  });
+}
+
+// ===== SIDEBAR =====
+function renderSidebar() {
+  const container = document.getElementById('sidebarSystems');
+  let html = '';
+  Object.entries(SYSTEMS).forEach(([sys, topics]) => {
+    const c1Count = topics.filter(t => getC1(t)).length;
+    const isOpen = collapsedSystems['sb_' + sys] === true;
+    html += `<div class="sys-group ${isOpen ? 'open' : ''}">
+      <div class="sys-group-header" onclick="toggleSidebarSystem('${sys.replace(/'/g, "\\'")}')">
+        <span class="sys-group-name">${sys}</span>
+        <span class="sys-group-count">${c1Count}/${topics.length}</span>
+      </div>
+      <div class="sys-group-topics">`;
+    topics.forEach(t => {
+      const done = !!getC1(t);
+      html += `<div class="sys-topic-link ${done ? 'done' : ''}" onclick="jumpToTopic('${t.replace(/'/g, "\\'")}')">${t}</div>`;
+    });
+    html += `</div></div>`;
+  });
+  container.innerHTML = html;
+}
+
+function toggleSidebarSystem(sys) {
+  collapsedSystems['sb_' + sys] = !collapsedSystems['sb_' + sys];
+  const groups = document.querySelectorAll('.sys-group');
+  groups.forEach(g => {
+    const name = g.querySelector('.sys-group-name').textContent;
+    if (name === sys) g.classList.toggle('open');
+  });
+}
+
+function jumpToTopic(topic) {
+  switchView('log');
+  setTimeout(() => {
+    const search = document.getElementById('logSearch');
+    search.value = topic;
+    filterLogTopics(topic);
+    // Scroll to it
+    const row = document.querySelector(`.log-topic-row[data-topic="${topic.toLowerCase()}"]`);
+    if (row) row.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }, 50);
 }
 
-// ─── TAB SWITCHING ────────────────────────────────────────────────────────────
-
-let calInitialized = false;
-let calendarInstance = null;
-
-function switchTab(tab) {
-  document.getElementById('tabBtnTable').classList.toggle('active', tab === 'table');
-  document.getElementById('tabBtnCalendar').classList.toggle('active', tab === 'calendar');
-  document.getElementById('tabTable').classList.toggle('active', tab === 'table');
-  document.getElementById('tabCalendar').classList.toggle('active', tab === 'calendar');
-  document.getElementById('navTable').classList.toggle('active', tab === 'table');
-  document.getElementById('navCalendar').classList.toggle('active', tab === 'calendar');
-  if (tab === 'calendar' && !calInitialized) initCalendar();
-}
-
-// ─── SEARCH ───────────────────────────────────────────────────────────────────
-
-function searchTopics(query) {
-  query = query.toLowerCase().trim();
-  document.querySelectorAll('.topic-item').forEach(item => {
-    const name = (item.querySelector('.topic-name')?.textContent || '').toLowerCase();
-    item.style.display = (!query || name.includes(query)) ? '' : 'none';
+// ===== NAVIGATION =====
+function switchView(view) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    n.classList.toggle('active', n.dataset.view === view);
   });
-  // Show all week blocks when searching
-  if (query) {
-    document.querySelectorAll('.week-block.filtered-out').forEach(b => b.style.display = '');
-    document.querySelectorAll('.week-block.collapsed').forEach(b => b.classList.remove('collapsed'));
-  }
+  // Close mobile sidebar
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
 }
 
-// ─── PROGRESS RING ────────────────────────────────────────────────────────────
-
-function updateProgressRing(c1done, total) {
-  const pct = total > 0 ? c1done / total : 0;
-  const circum = 119.38; // 2π × 19
-  const offset = circum * (1 - pct);
-  const el = document.getElementById('ringFillC1');
-  const pctEl = document.getElementById('ringPct');
-  if (el) el.setAttribute('stroke-dashoffset', offset.toFixed(2));
-  if (pctEl) pctEl.textContent = Math.round(pct * 100) + '%';
+function toggleMobileMenu() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
 }
 
-// ─── DRAG & DROP (TABLE) ──────────────────────────────────────────────────────
-
-let dragData = null;
-
-function onDragStart(event) {
-  const item = event.currentTarget;
-  dragData = {
-    topic: item.dataset.topic,
-    cycle: item.dataset.cycle,
-    fromWeek: parseInt(item.dataset.week)
-  };
-  item.classList.add('dragging');
-  event.dataTransfer.effectAllowed = 'move';
-  event.dataTransfer.setData('text/plain', dragData.topic);
-}
-
-function onDragOver(event) {
-  event.preventDefault();
-  event.dataTransfer.dropEffect = 'move';
-  event.currentTarget.classList.add('drag-over');
-}
-
-function onDragLeave(event) {
-  event.currentTarget.classList.remove('drag-over');
-}
-
-function onDrop(event, toWeekNum, toDate) {
-  event.preventDefault();
-  event.currentTarget.classList.remove('drag-over');
-  if (!dragData) return;
-  const { topic, cycle, fromWeek } = dragData;
-  dragData = null;
-
-  const srcWeek  = scheduleData.find(w => w.week === fromWeek);
-  const destWeek = scheduleData.find(w => w.week === toWeekNum);
-  if (!srcWeek || !destWeek) return;
-
-  // Remove from source day
-  const listKey = cycle === 'c1' ? 'learn' : cycle;
-  for (const day of srcWeek.days) {
-    if (!day.special && day[listKey]) {
-      const idx = day[listKey].indexOf(topic);
-      if (idx !== -1) { day[listKey].splice(idx, 1); break; }
-    }
-  }
-
-  // Add to destination day
-  const destDay = destWeek.days.find(d => !d.special && d.date === toDate);
-  if (destDay) {
-    if (!destDay[listKey]) destDay[listKey] = [];
-    if (!destDay[listKey].includes(topic)) destDay[listKey].push(topic);
-  }
-
-  renderSchedule();
-  renderSidebarWeeks();
-  updateStats();
-  refreshCalendar();
-}
-
-// ─── FULLCALENDAR ─────────────────────────────────────────────────────────────
-
-const MONTH_MAP = { Jan:1,Feb:2,Mar:3,Apr:4,May:5,Jun:6,Jul:7,Aug:8,Sep:9,Oct:10,Nov:11,Dec:12 };
-
-function resolveDate(week, day) {
-  const parts = (day.date || '').split(' ');
-  if (parts.length < 2) return null;
-  const mon = MONTH_MAP[parts[0]];
-  const d   = parseInt(parts[1]);
-  if (!mon || !d) return null;
-  const yr = new Date(week.startDate).getFullYear();
-  return `${yr}-${String(mon).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-}
-
-function buildCalEvents() {
-  const events = [];
-  for (const week of scheduleData) {
-    for (const day of week.days) {
-      if (day.special) continue;
-      const dateStr = resolveDate(week, day);
-      if (!dateStr) continue;
-      const push = (list, cycle, cls) => {
-        (list || []).forEach(t => events.push({
-          title: t,
-          date: dateStr,
-          classNames: ['ev-' + cycle, state[t+'|'+cycle] ? 'ev-done' : ''],
-          extendedProps: { topic: t, cycle, weekNum: week.week }
-        }));
-      };
-      push(day.learn, 'c1', 'ev-c1');
-      push(day.c2,    'c2', 'ev-c2');
-      push(day.c3,    'c3', 'ev-c3');
-    }
-  }
-  return events;
-}
-
-function initCalendar() {
-  if (typeof FullCalendar === 'undefined') {
-    document.getElementById('fullCalendarEl').innerHTML =
-      '<p style="padding:24px;color:var(--text-dim);font-weight:700">FullCalendar failed to load. Check your internet connection and refresh.</p>';
-    return;
-  }
-  calInitialized = true;
-  calendarInstance = new FullCalendar.Calendar(document.getElementById('fullCalendarEl'), {
-    initialView: 'dayGridMonth',
-    initialDate: '2026-02-27',
-    headerToolbar: { left: 'prev,next today', center: 'title', right: '' },
-    height: 'auto',
-    events: buildCalEvents(),
-    eventClick: function(info) { showEventPopup(info.event, info.jsEvent); }
-  });
-  calendarInstance.render();
-}
-
-function refreshCalendar() {
-  if (!calInitialized || !calendarInstance) return;
-  calendarInstance.removeAllEvents();
-  buildCalEvents().forEach(ev => calendarInstance.addEvent(ev));
-}
-
-function setCalView(view, btn) {
-  document.querySelectorAll('.cal-view-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  if (calendarInstance) calendarInstance.changeView(view);
-}
-
-// ─── EVENT POPUP ──────────────────────────────────────────────────────────────
-
-let popupTopic = null;
-let popupCycle = null;
-
-function showEventPopup(event, jsEvent) {
-  const { topic, cycle } = event.extendedProps;
-  popupTopic = topic;
-  popupCycle = cycle;
-
-  document.getElementById('popupTitle').textContent = topic;
-  document.getElementById('popupCycle').textContent =
-    cycle === 'c1' ? 'Cycle 1 — Learn' :
-    cycle === 'c2' ? 'Cycle 2 — Review' : 'Cycle 3 — Rapid Refresh';
-
-  const checkEl = document.getElementById('popupCheck');
-  const checked = !!state[topic + '|' + cycle];
-  checkEl.className = 'cycle-check ' + cycle + (checked ? ' checked' : '');
-  checkEl.innerHTML = checked ? '&#10003;' : '';
-
-  const popup = document.getElementById('eventPopup');
-  popup.classList.add('open');
-  const px = Math.min(jsEvent.clientX + 8, window.innerWidth - 280);
-  const py = Math.min(jsEvent.clientY + 8, window.innerHeight - 150);
-  popup.style.left = px + 'px';
-  popup.style.top  = py + 'px';
-}
-
-function closeEventPopup() {
-  document.getElementById('eventPopup').classList.remove('open');
-  popupTopic = null;
-  popupCycle = null;
-}
-
-function togglePopupTopic() {
-  if (!popupTopic || !popupCycle) return;
-  const key = popupTopic + '|' + popupCycle;
-  state[key] = !state[key];
-  saveState(state);
-  const checkEl = document.getElementById('popupCheck');
-  checkEl.classList.toggle('checked', state[key]);
-  checkEl.innerHTML = state[key] ? '&#10003;' : '';
-  updateStats();
-  refreshCalendar();
-}
-
-// Close popup on outside click
-document.addEventListener('click', function(e) {
-  const popup = document.getElementById('eventPopup');
-  if (popup.classList.contains('open') && !popup.contains(e.target)) closeEventPopup();
-});
-
-// ─── INIT ────────────────────────────────────────────────────────────────────
-// Show loading overlay until Firestore state is ready
+// ===== INIT =====
 document.addEventListener('firebaseReady', function() {
-  const overlay = document.getElementById('loadingOverlay');
-  if (overlay) overlay.style.display = 'none';
-  renderSchedule();
-  renderSidebarWeeks();
-  updateStats();
+  document.getElementById('loadingOverlay').style.display = 'none';
+  renderAll();
 });
-
-// Auto-expand current week only
-setTimeout(() => {
-  document.querySelectorAll('.week-block').forEach(block => {
-    const startDate = new Date(block.dataset.start);
-    const today = new Date();
-    const endDate = new Date(startDate);
-    endDate.setDate(endDate.getDate() + 7);
-    if (!(today >= startDate && today < endDate)) {
-      block.classList.add('collapsed');
-    }
-  });
-}, 0);
-
-function downloadTracker() {
-  // Update the internal state into the document's script for the next load
-  const currentState = JSON.stringify(state);
-  let htmlContent = document.documentElement.outerHTML;
-  
-  // This replaces the old state with the current progress in the new file
-  const stateRegex = /let state = loadState\(\);/g;
-  const newStateInjected = `let state = loadState(); state = JSON.parse('${currentState}');`;
-  htmlContent = htmlContent.replace(stateRegex, newStateInjected);
-
-  const blob = new Blob([htmlContent], { type: 'text/html' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  
-  const date = new Date().toISOString().split('T')[0];
-  a.download = `PEBC_Tracker_${date}.html`;
-  a.click();
-}
 </script>
 </body>
 </html>
