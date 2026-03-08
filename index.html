@@ -1230,7 +1230,9 @@ const C2_OFFSET = 3;
 const C3_OFFSET = 10; // C1 + 10 = C2 + 7
 
 // ===== STATE =====
-let state = {};
+// Using var so `state` lives on window — the Firebase module script
+// writes window.state when it loads, and all helpers must reference the same object.
+var state = {};
 let collapsedCards = {};
 let collapsedSystems = {};
 let sortCol = 'topic';
@@ -1277,9 +1279,17 @@ function getPretest(t)  { return state[t + '|pretest'] || ''; }
 function getPosttest(t) { return state[t + '|posttest'] || ''; }
 function getWeak(t)     { return state[t + '|weak'] || ''; }
 
-function setPretest(topic, val)  { state[topic + '|pretest'] = val; save(); }
-function setPosttest(topic, val) { state[topic + '|posttest'] = val; save(); }
-function setWeak(topic, val)     { state[topic + '|weak'] = val; save(); }
+// Debounced save for text inputs — saves 600ms after last keystroke
+var _debouncers = {};
+function debouncedSave(key, topic, val) {
+  state[topic + '|' + key] = val;
+  clearTimeout(_debouncers[topic + key]);
+  _debouncers[topic + key] = setTimeout(function() { save(); }, 600);
+}
+
+function setPretest(topic, val)  { debouncedSave('pretest', topic, val); }
+function setPosttest(topic, val) { debouncedSave('posttest', topic, val); }
+function setWeak(topic, val)     { debouncedSave('weak', topic, val); }
 
 function parseMissRatio(val) {
   if (!val) return -1;
@@ -1368,10 +1378,11 @@ function undoTopic(topic) {
 }
 
 function save() {
+  // Always save to localStorage as immediate backup
+  try { localStorage.setItem('pebc_tracker_v3', JSON.stringify(state)); } catch(_) {}
+  // Then persist to Firestore (async)
   if (window._saveToFirestore) {
     window._saveToFirestore(state);
-  } else {
-    try { localStorage.setItem('pebc_tracker_v3', JSON.stringify(state)); } catch(_) {}
   }
   const ind = document.getElementById('saveIndicator');
   if (ind) {
@@ -1670,11 +1681,11 @@ function renderLogTopics() {
       if (c1) {
         extrasHTML = `<div class="log-topic-extras">
           <label>Pre: <input class="score-input" placeholder="0/0" value="${getPretest(t)}"
-            onchange="event.stopPropagation();setPretest('${escapedT}', this.value)"></label>
+            oninput="event.stopPropagation();setPretest('${escapedT}', this.value)"></label>
           <label>Post: <input class="score-input" placeholder="0/0" value="${getPosttest(t)}"
-            onchange="event.stopPropagation();setPosttest('${escapedT}', this.value)"></label>
+            oninput="event.stopPropagation();setPosttest('${escapedT}', this.value)"></label>
           <label>Weak: <input class="weak-input" placeholder="tags..." value="${getWeak(t)}"
-            onchange="event.stopPropagation();setWeak('${escapedT}', this.value)"></label>
+            oninput="event.stopPropagation();setWeak('${escapedT}', this.value)"></label>
         </div>`;
       }
 
@@ -1780,9 +1791,9 @@ function renderAllTopicsTable() {
       <td class="${c2Class}">${c2Done ? formatDate(c2Done) : (c2Due && c2Due <= today ? (c2Due < today ? 'Overdue' : 'Due') : '—')}</td>
       <td class="${c3Due ? 'td-pending' : 'td-na'}">${c3Due ? formatDate(c3Due) : '—'}</td>
       <td class="${c3Class}">${c3Done ? formatDate(c3Done) : (c3Due && c3Due <= today && c2Done ? (c3Due < today ? 'Overdue' : 'Due') : '—')}</td>
-      <td><input class="score-input" value="${getPretest(t)}" placeholder="—" onchange="setPretest('${escapedTbl}', this.value)"></td>
-      <td><input class="score-input" value="${getPosttest(t)}" placeholder="—" onchange="setPosttest('${escapedTbl}', this.value)"></td>
-      <td><input class="weak-input" value="${getWeak(t)}" placeholder="—" onchange="setWeak('${escapedTbl}', this.value)"></td>
+      <td><input class="score-input" value="${getPretest(t)}" placeholder="—" oninput="setPretest('${escapedTbl}', this.value)"></td>
+      <td><input class="score-input" value="${getPosttest(t)}" placeholder="—" oninput="setPosttest('${escapedTbl}', this.value)"></td>
+      <td><input class="weak-input" value="${getWeak(t)}" placeholder="—" oninput="setWeak('${escapedTbl}', this.value)"></td>
     </tr>`;
   });
 
