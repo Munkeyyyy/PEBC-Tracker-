@@ -746,6 +746,62 @@ body {
 
 .date-pick-cancel:hover { border-color: var(--coral); color: var(--coral); }
 
+/* ===== INLINE SCORE / WEAK INPUTS ===== */
+.score-input {
+  font-family: 'Nunito', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  width: 54px;
+  padding: 3px 6px;
+  border: 1.5px solid var(--border);
+  border-radius: 4px;
+  text-align: center;
+  color: var(--text);
+  outline: none;
+  background: var(--white);
+}
+
+.score-input:focus { border-color: var(--coral); }
+.score-input::placeholder { color: var(--border); }
+
+.weak-input {
+  font-family: 'Nunito', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  width: 130px;
+  padding: 3px 6px;
+  border: 1.5px solid var(--border);
+  border-radius: 4px;
+  color: var(--text);
+  outline: none;
+  background: var(--white);
+}
+
+.weak-input:focus { border-color: var(--coral); }
+.weak-input::placeholder { color: var(--border); font-style: italic; }
+
+.log-topic-extras {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 0 16px 8px;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.log-topic-extras label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .log-topic-extras { flex-wrap: wrap; gap: 8px; }
+  .weak-input { width: 100px; }
+}
+
 /* ===== ALL TOPICS TABLE ===== */
 .table-controls {
   display: flex;
@@ -950,7 +1006,7 @@ body {
         <select id="allFilterYield" onchange="filterAllTopics()">
           <option value="">All Yields</option>
           <option value="high">High</option>
-          <option value="low-med">Low-Med</option>
+          <option value="low-med">Low-Med · Light</option>
           <option value="low">Low</option>
         </select>
         <select id="allFilterStatus" onchange="filterAllTopics()">
@@ -975,6 +1031,9 @@ body {
               <th data-col="c2done" onclick="sortAllTopics('c2done')">C2 Done <span class="sort-arrow"></span></th>
               <th data-col="c3due" onclick="sortAllTopics('c3due')">C3 Due <span class="sort-arrow"></span></th>
               <th data-col="c3done" onclick="sortAllTopics('c3done')">C3 Done <span class="sort-arrow"></span></th>
+              <th data-col="pretest" onclick="sortAllTopics('pretest')">Pre-test <span class="sort-arrow"></span></th>
+              <th data-col="posttest" onclick="sortAllTopics('posttest')">Post-test <span class="sort-arrow"></span></th>
+              <th data-col="weak" onclick="sortAllTopics('weak')">Weak Spots <span class="sort-arrow"></span></th>
             </tr>
           </thead>
           <tbody id="allTableBody"></tbody>
@@ -1148,7 +1207,7 @@ const TOPIC_YIELD = {
   "Urinary Incontinence": "low"
 };
 
-const YIELD_LABELS = { "high": "High", "low-med": "Low-Med", "low": "Low" };
+const YIELD_LABELS = { "high": "High", "low-med": "Low-Med · Light", "low": "Low" };
 
 function yieldTag(topic) {
   const y = TOPIC_YIELD[topic];
@@ -1212,6 +1271,24 @@ function getC2Done(t) { return state[t + '|c2'] || null; }
 function getC3Done(t) { return state[t + '|c3'] || null; }
 function getC2Due(t) { const c1 = getC1(t); return c1 ? addDays(c1, C2_OFFSET) : null; }
 function getC3Due(t) { const c1 = getC1(t); return c1 ? addDays(c1, C3_OFFSET) : null; }
+
+// Pre-test, Post-test, Weak Spots
+function getPretest(t)  { return state[t + '|pretest'] || ''; }
+function getPosttest(t) { return state[t + '|posttest'] || ''; }
+function getWeak(t)     { return state[t + '|weak'] || ''; }
+
+function setPretest(topic, val)  { state[topic + '|pretest'] = val; save(); }
+function setPosttest(topic, val) { state[topic + '|posttest'] = val; save(); }
+function setWeak(topic, val)     { state[topic + '|weak'] = val; save(); }
+
+function parseMissRatio(val) {
+  if (!val) return -1;
+  const parts = val.split('/');
+  if (parts.length !== 2) return -1;
+  const missed = parseInt(parts[0]), total = parseInt(parts[1]);
+  if (isNaN(missed) || isNaN(total) || total === 0) return -1;
+  return missed / total;
+}
 
 // ===== MIGRATION =====
 window._migrateState = function(parsed) {
@@ -1589,9 +1666,22 @@ function renderLogTopics() {
         statusHTML += ` <button class="log-undo-btn" onclick="event.stopPropagation();undoTopic('${escapedT}')" title="Reset topic">&#8634;</button>`;
       }
 
+      let extrasHTML = '';
+      if (c1) {
+        extrasHTML = `<div class="log-topic-extras">
+          <label>Pre: <input class="score-input" placeholder="0/0" value="${getPretest(t)}"
+            onchange="event.stopPropagation();setPretest('${escapedT}', this.value)"></label>
+          <label>Post: <input class="score-input" placeholder="0/0" value="${getPosttest(t)}"
+            onchange="event.stopPropagation();setPosttest('${escapedT}', this.value)"></label>
+          <label>Weak: <input class="weak-input" placeholder="tags..." value="${getWeak(t)}"
+            onchange="event.stopPropagation();setWeak('${escapedT}', this.value)"></label>
+        </div>`;
+      }
+
       html += `<div class="log-topic-row" data-topic="${t.toLowerCase()}">
         <div class="log-topic-name">${t}${yieldTag(t)}</div>
         <div class="log-cycle-status">${statusHTML}</div>
+        ${extrasHTML}
       </div>`;
     });
 
@@ -1648,6 +1738,9 @@ function renderAllTopicsTable() {
       case 'c2done': va = getC2Done(a) || 'z'; vb = getC2Done(b) || 'z'; break;
       case 'c3due': va = getC3Due(a) || 'z'; vb = getC3Due(b) || 'z'; break;
       case 'c3done': va = getC3Done(a) || 'z'; vb = getC3Done(b) || 'z'; break;
+      case 'pretest': va = parseMissRatio(getPretest(a)); vb = parseMissRatio(getPretest(b)); break;
+      case 'posttest': va = parseMissRatio(getPosttest(a)); vb = parseMissRatio(getPosttest(b)); break;
+      case 'weak': va = getWeak(a) || 'zzz'; vb = getWeak(b) || 'zzz'; break;
       default: va = a; vb = b;
     }
     const cmp = String(va).localeCompare(String(vb));
@@ -1677,7 +1770,8 @@ function renderAllTopicsTable() {
     const yldClass = yld === 'high' ? 'td-yield-high' : (yld === 'low-med' ? 'td-yield-lowmed' : (yld === 'low' ? 'td-yield-low' : 'td-na'));
     const yldLabel = yld ? YIELD_LABELS[yld] : '—';
 
-    html += `<tr data-topic="${t.toLowerCase()}" data-system="${TOPIC_TO_SYSTEM[t]}" data-status="${status}" data-yield="${yld}">
+    const escapedTbl = t.replace(/'/g, "\\'");
+    html += `<tr data-topic="${t.toLowerCase()}" data-system="${TOPIC_TO_SYSTEM[t]}" data-status="${status}" data-yield="${yld}" data-weak="${getWeak(t).toLowerCase()}">
       <td style="font-weight:700">${t}</td>
       <td class="${yldClass}">${yldLabel}</td>
       <td style="color:var(--text-dim)">${TOPIC_TO_SYSTEM[t]}</td>
@@ -1686,6 +1780,9 @@ function renderAllTopicsTable() {
       <td class="${c2Class}">${c2Done ? formatDate(c2Done) : (c2Due && c2Due <= today ? (c2Due < today ? 'Overdue' : 'Due') : '—')}</td>
       <td class="${c3Due ? 'td-pending' : 'td-na'}">${c3Due ? formatDate(c3Due) : '—'}</td>
       <td class="${c3Class}">${c3Done ? formatDate(c3Done) : (c3Due && c3Due <= today && c2Done ? (c3Due < today ? 'Overdue' : 'Due') : '—')}</td>
+      <td><input class="score-input" value="${getPretest(t)}" placeholder="—" onchange="setPretest('${escapedTbl}', this.value)"></td>
+      <td><input class="score-input" value="${getPosttest(t)}" placeholder="—" onchange="setPosttest('${escapedTbl}', this.value)"></td>
+      <td><input class="weak-input" value="${getWeak(t)}" placeholder="—" onchange="setWeak('${escapedTbl}', this.value)"></td>
     </tr>`;
   });
 
@@ -1721,7 +1818,7 @@ function filterAllTopics() {
   const status = document.getElementById('allFilterStatus').value;
 
   document.querySelectorAll('#allTableBody tr').forEach(row => {
-    const matchQuery = !query || row.dataset.topic.includes(query);
+    const matchQuery = !query || row.dataset.topic.includes(query) || (row.dataset.weak || '').includes(query);
     const matchSys = !sys || row.dataset.system === sys;
     const matchYield = !yld || row.dataset.yield === yld;
     const matchStatus = !status || row.dataset.status === status;
